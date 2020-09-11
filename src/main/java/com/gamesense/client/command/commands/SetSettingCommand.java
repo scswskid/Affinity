@@ -1,7 +1,7 @@
 package com.gamesense.client.command.commands;
 
 import com.gamesense.api.settings.Setting;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.module.Module;
 import com.gamesense.client.module.ModuleManager;
@@ -26,7 +26,7 @@ public class SetSettingCommand extends Command{
 	public void onCommand(String command, String[] args) throws Exception{
 		for (Module m : ModuleManager.getModules()){
 			if (m.getName().equalsIgnoreCase(args[0])){
-				GameSenseMod.getInstance().settingsManager.getSettingsForMod(m).stream().filter(s -> s.getConfigName().equalsIgnoreCase(args[1])).forEach(s -> {
+				AffinityPlus.getInstance().settingsManager.getSettingsForMod(m).stream().filter(s -> s.getConfigName().equalsIgnoreCase(args[1])).forEach(s -> {
 					if (s.getType().equals(Setting.Type.BOOLEAN)){
 							((Setting.Boolean) s).setValue(java.lang.Boolean.parseBoolean(args[2]));
 							Command.sendClientMessage(s.getConfigName() + " set to " + ((Setting.Boolean) s).getValue() + "!");

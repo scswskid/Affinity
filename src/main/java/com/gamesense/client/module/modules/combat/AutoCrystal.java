@@ -7,7 +7,7 @@ import com.gamesense.api.settings.Setting;
 import com.gamesense.api.util.font.FontUtils;
 import com.gamesense.api.util.render.GameSenseTessellator;
 import com.gamesense.api.util.GSColor;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.module.Module;
 import com.gamesense.client.module.ModuleManager;
@@ -42,7 +42,6 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import net.minecraft.world.Explosion;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -51,12 +50,11 @@ import java.util.stream.Collectors;
 
 /**
  * @Author Cyber
- * //Modified by Hoosiers :D
  */
 
 public class AutoCrystal extends Module {
     public AutoCrystal() {
-        super("AutoCrystalGS", Category.Combat);
+        super("AutoCrystal", Category.Combat);
     }
 
     private BlockPos render;
@@ -694,7 +692,7 @@ public class AutoCrystal extends Module {
 
     @Override
     public void onEnable() {
-        GameSenseMod.EVENT_BUS.subscribe(this);
+        AffinityPlus.EVENT_BUS.subscribe(this);
         PlacedCrystals.clear();
         isActive = false;
         isPlacing = false;
@@ -706,7 +704,7 @@ public class AutoCrystal extends Module {
 
     @Override
     public void onDisable() {
-        GameSenseMod.EVENT_BUS.unsubscribe(this);
+        AffinityPlus.EVENT_BUS.unsubscribe(this);
         render = null;
         renderEnt = null;
         resetRotation();

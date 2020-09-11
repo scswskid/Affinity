@@ -5,9 +5,7 @@ import com.gamesense.api.players.friends.Friends;
 import com.gamesense.api.settings.Setting;
 import com.gamesense.api.util.font.FontUtils;
 import com.gamesense.api.util.GSColor;
-import com.gamesense.client.GameSenseMod;
 import com.gamesense.client.module.Module;
-import com.gamesense.client.module.modules.hud.HUD;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.TextFormatting;
 

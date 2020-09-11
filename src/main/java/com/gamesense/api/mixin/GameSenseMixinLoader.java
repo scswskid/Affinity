@@ -1,6 +1,6 @@
 package com.gamesense.api.mixin;
 
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.MixinEnvironment;
@@ -14,11 +14,11 @@ public class GameSenseMixinLoader implements IFMLLoadingPlugin{
 	private static boolean isObfuscatedEnvironment = false;
 
 	public GameSenseMixinLoader(){
-		GameSenseMod.log.info("GameSense mixins initialized");
+		AffinityPlus.log.info("GameSense mixins initialized");
 		MixinBootstrap.init();
 		Mixins.addConfiguration("mixins.gamesense.json");
 		MixinEnvironment.getDefaultEnvironment().setObfuscationContext("searge");
-		GameSenseMod.log.info(MixinEnvironment.getDefaultEnvironment().getObfuscationContext());
+		AffinityPlus.log.info(MixinEnvironment.getDefaultEnvironment().getObfuscationContext());
 	}
 
 	@Override

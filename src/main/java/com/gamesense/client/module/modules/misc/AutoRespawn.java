@@ -2,7 +2,7 @@ package com.gamesense.client.module.modules.misc;
 
 import com.gamesense.api.event.events.GuiScreenDisplayedEvent;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.module.Module;
 import me.zero.alpine.listener.EventHandler;
@@ -32,10 +32,10 @@ public class AutoRespawn extends Module{
 	});
 
 	public void onEnable(){
-		GameSenseMod.EVENT_BUS.subscribe(this);
+		AffinityPlus.EVENT_BUS.subscribe(this);
 	}
 
 	public void onDisable(){
-		GameSenseMod.EVENT_BUS.unsubscribe(this);
+		AffinityPlus.EVENT_BUS.unsubscribe(this);
 	}
 }

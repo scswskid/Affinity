@@ -5,7 +5,7 @@ import com.gamesense.api.settings.Setting;
 import com.gamesense.api.util.world.EntityUtil;
 import com.gamesense.api.util.world.MotionUtils;
 import com.gamesense.api.util.world.Timer;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.module.Module;
 import com.gamesense.client.module.ModuleManager;
 import com.mojang.realmsclient.gui.ChatFormatting;
@@ -49,7 +49,7 @@ public class Speed extends Module{
 	@Override
 	public void onEnable(){
 		moveSpeed = MotionUtils.getBaseMoveSpeed();
-		GameSenseMod.EVENT_BUS.subscribe(this);
+		AffinityPlus.EVENT_BUS.subscribe(this);
 	}
 
 	public void onUpdate(){
@@ -140,7 +140,7 @@ public class Speed extends Module{
 
 	@Override
 	public void onDisable(){
-		GameSenseMod.EVENT_BUS.unsubscribe(this);
+		AffinityPlus.EVENT_BUS.unsubscribe(this);
 		EntityUtil.resetTimer();
 	}
 

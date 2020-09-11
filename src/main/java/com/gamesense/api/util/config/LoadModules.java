@@ -1,7 +1,7 @@
 package com.gamesense.api.util.config;
 
 import com.gamesense.api.settings.Setting;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.module.Module;
 import com.gamesense.client.module.ModuleManager;
 
@@ -45,7 +45,7 @@ public class LoadModules{
 				String m = curLine.split(":")[2];
 				for (Module mm: ModuleManager.getModulesInCategory(category)){
 					if (mm != null && mm.getName().equalsIgnoreCase(m)){
-						Setting mod = GameSenseMod.getInstance().settingsManager.getSettingByNameAndMod(configname,mm);
+						Setting mod = AffinityPlus.getInstance().settingsManager.getSettingByNameAndMod(configname,mm);
 						if (mod.getType()==type || (type==Setting.Type.INT && mod.getType()==Setting.Type.DOUBLE)){
 							switch (mod.getType()){
 							case INT:

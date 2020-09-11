@@ -28,12 +28,12 @@ import org.lwjgl.opengl.Display;
 
 import java.awt.*;
 
-@Mod(modid = GameSenseMod.MODID, name = GameSenseMod.FORGENAME, version = GameSenseMod.MODVER, clientSideOnly = true)
-public class GameSenseMod{
-	public static final String MODID = "gamesense";
-	public static String MODNAME = "GameSense";
-	public static final String MODVER = "v2.1.2";
-	public static final String FORGENAME = "GameSense";
+@Mod(modid = AffinityPlus.MODID, name = AffinityPlus.FORGENAME, version = AffinityPlus.MODVER, clientSideOnly = true)
+public class AffinityPlus {
+	public static final String MODID = "affinityplus";
+	public static String MODNAME = "Affinity+";
+	public static final String MODVER = "v0.0.1";
+	public static final String FORGENAME = "Affinity Plus";
 
 	public static final Logger log = LogManager.getLogger(MODNAME);
 
@@ -54,9 +54,9 @@ public class GameSenseMod{
 	public static final EventBus EVENT_BUS = new EventManager();
 
 	@Mod.Instance
-	private static GameSenseMod INSTANCE;
+	private static AffinityPlus INSTANCE;
 
-	public GameSenseMod(){
+	public AffinityPlus(){
 		INSTANCE = this;
 	}
 
@@ -119,7 +119,7 @@ public class GameSenseMod{
 		log.info("PostInitialization complete!\n");
 	}
 
-	public static GameSenseMod getInstance(){
+	public static AffinityPlus getInstance(){
 		return INSTANCE;
 	}
 }

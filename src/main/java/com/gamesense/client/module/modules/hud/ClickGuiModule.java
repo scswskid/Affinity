@@ -1,7 +1,7 @@
 package com.gamesense.client.module.modules.hud;
 
 import com.gamesense.api.settings.Setting;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.module.Module;
 import com.gamesense.client.module.ModuleManager;
@@ -42,7 +42,7 @@ public class ClickGuiModule extends Module{
 	}
 
 	public void onEnable(){
-		mc.displayGuiScreen(GameSenseMod.getInstance().clickGUI);
+		mc.displayGuiScreen(AffinityPlus.getInstance().clickGUI);
 		if(((Announcer) ModuleManager.getModuleByName("Announcer")).clickGui.getValue() && ModuleManager.isModuleEnabled("Announcer") && mc.player != null)
 			if(((Announcer)ModuleManager.getModuleByName("Announcer")).clientSide.getValue()){
 				Command.sendClientMessage(Announcer.guiMessage);

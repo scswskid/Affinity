@@ -1,6 +1,6 @@
 package com.gamesense.api.mixin.mixins;
 
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.api.event.events.GuiScreenDisplayedEvent;
 import com.gamesense.client.module.ModuleManager;
 import net.minecraft.client.Minecraft;
@@ -24,7 +24,7 @@ public class MixinMinecraft{
 	@Inject(method = "displayGuiScreen", at = @At("HEAD"))
 	private void displayGuiScreen(GuiScreen guiScreenIn, CallbackInfo info){
 		GuiScreenDisplayedEvent screenEvent = new GuiScreenDisplayedEvent(guiScreenIn);
-		GameSenseMod.EVENT_BUS.post(screenEvent);
+		AffinityPlus.EVENT_BUS.post(screenEvent);
 	}
 
 	//credit cookiedragon234 this is very epic

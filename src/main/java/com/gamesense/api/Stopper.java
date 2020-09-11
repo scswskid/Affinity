@@ -1,7 +1,7 @@
 package com.gamesense.api;
 
 import com.gamesense.api.util.config.SaveConfiguration;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 
 public class Stopper extends Thread{
 
@@ -12,7 +12,7 @@ public class Stopper extends Thread{
 
 	public static void saveConfig(){
 
-		GameSenseMod.getInstance().saveModules.saveModules();
+		AffinityPlus.getInstance().saveModules.saveModules();
 
 		SaveConfiguration.saveAutoGG();
 		SaveConfiguration.saveAutoReply();

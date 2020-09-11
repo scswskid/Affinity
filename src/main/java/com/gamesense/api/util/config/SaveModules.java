@@ -1,7 +1,7 @@
 package com.gamesense.api.util.config;
 
 import com.gamesense.api.settings.Setting;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.module.Module;
 
 import java.io.BufferedWriter;
@@ -36,7 +36,7 @@ public class SaveModules{
 		try{
 			File file = new File(config.getAbsolutePath(),filename);
 			BufferedWriter out = new BufferedWriter(new FileWriter(file));
-			Iterator iter = GameSenseMod.getInstance().settingsManager.getSettingsByCategory(category).iterator();
+			Iterator iter = AffinityPlus.getInstance().settingsManager.getSettingsByCategory(category).iterator();
 			while(iter.hasNext()){
 				Setting mod = (Setting)iter.next();
 				if (mod.getType()==type || (type==Setting.Type.INT && mod.getType()==Setting.Type.DOUBLE)){

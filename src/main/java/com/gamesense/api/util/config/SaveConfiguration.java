@@ -4,7 +4,7 @@ import com.gamesense.api.players.enemy.Enemies;
 import com.gamesense.api.players.enemy.Enemy;
 import com.gamesense.api.players.friends.Friend;
 import com.gamesense.api.players.friends.Friends;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.clickgui.frame.Frames;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.clickgui.ClickGUI;
@@ -110,7 +110,7 @@ public class SaveConfiguration{
 		try{
 			File file = new File(Miscellaneous.getAbsolutePath(), "ClientMacros.json");
 			BufferedWriter out = new BufferedWriter(new FileWriter(file));
-			Iterator var3 = GameSenseMod.getInstance().macroManager.getMacros().iterator();
+			Iterator var3 = AffinityPlus.getInstance().macroManager.getMacros().iterator();
 			while(var3.hasNext()){
 				Macro m = (Macro) var3.next();
 				out.write(Keyboard.getKeyName(m.getKey()) + ":" + m.getValue().replace(" ", "_"));
@@ -174,7 +174,7 @@ public class SaveConfiguration{
 		try{
 			File file = new File(Miscellaneous.getAbsolutePath(), "CustomFont.json");
 			BufferedWriter out = new BufferedWriter(new FileWriter(file));
-			out.write(GameSenseMod.fontRenderer.getFontName()+ ":" + GameSenseMod.fontRenderer.getFontSize());
+			out.write(AffinityPlus.fontRenderer.getFontName()+ ":" + AffinityPlus.fontRenderer.getFontSize());
 			out.write("\r\n");
 			out.close();
 		}

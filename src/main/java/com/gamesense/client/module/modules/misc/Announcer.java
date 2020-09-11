@@ -1,7 +1,7 @@
 package com.gamesense.client.module.modules.misc;
 
 import com.gamesense.api.settings.Setting;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.command.Command;
 import com.gamesense.api.event.events.DestroyBlockEvent;
 import com.gamesense.api.event.events.PacketEvent;
@@ -219,7 +219,7 @@ public class Announcer extends Module{
 	});
 
 	public void onEnable(){
-		GameSenseMod.EVENT_BUS.subscribe(this);
+		AffinityPlus.EVENT_BUS.subscribe(this);
 		blocksPlaced = 0;
 		blocksBroken = 0;
 		eaten = 0;
@@ -232,7 +232,7 @@ public class Announcer extends Module{
 	}
 
 	public void onDisable(){
-		GameSenseMod.EVENT_BUS.unsubscribe(this);
+		AffinityPlus.EVENT_BUS.unsubscribe(this);
 	}
 
 }

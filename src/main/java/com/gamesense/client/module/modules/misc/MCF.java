@@ -1,7 +1,7 @@
 package com.gamesense.client.module.modules.misc;
 
 import com.gamesense.api.players.friends.Friends;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.module.Module;
 import com.mojang.realmsclient.gui.ChatFormatting;
@@ -21,20 +21,20 @@ public class MCF extends Module{
 	private final Listener<InputEvent.MouseInputEvent> listener = new Listener<>(event -> {
 		if (mc.objectMouseOver.typeOfHit.equals(RayTraceResult.Type.ENTITY) && mc.objectMouseOver.entityHit instanceof EntityPlayer && Mouse.getEventButton() == 2){
 			if (Friends.isFriend(mc.objectMouseOver.entityHit.getName())){
-				GameSenseMod.getInstance().friends.delFriend(mc.objectMouseOver.entityHit.getName());
+				AffinityPlus.getInstance().friends.delFriend(mc.objectMouseOver.entityHit.getName());
 				Command.sendClientMessage(ChatFormatting.RED + "Removed " + mc.objectMouseOver.entityHit.getName() + " from friends list");
 			} else{
-				GameSenseMod.getInstance().friends.addFriend(mc.objectMouseOver.entityHit.getName());
+				AffinityPlus.getInstance().friends.addFriend(mc.objectMouseOver.entityHit.getName());
 				Command.sendClientMessage(ChatFormatting.GREEN + "Added " + mc.objectMouseOver.entityHit.getName() + " to friends list");
 			}
 		}
 	});
 
 	public void onEnable(){
-		GameSenseMod.EVENT_BUS.subscribe(this);
+		AffinityPlus.EVENT_BUS.subscribe(this);
 	}
 
 	public void onDisable(){
-		GameSenseMod.EVENT_BUS.unsubscribe(this);
+		AffinityPlus.EVENT_BUS.unsubscribe(this);
 	}
 }

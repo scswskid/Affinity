@@ -2,7 +2,7 @@ package com.gamesense.client.module.modules.render;
 
 import com.gamesense.api.event.events.BossbarEvent;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.module.Module;
 import me.zero.alpine.listener.EventHandler;
 import me.zero.alpine.listener.Listener;
@@ -88,10 +88,10 @@ public class NoRender extends Module{
 	});
 
 	public void onEnable(){
-		GameSenseMod.EVENT_BUS.subscribe(this);
+		AffinityPlus.EVENT_BUS.subscribe(this);
 	}
 
 	public void onDisable(){
-		GameSenseMod.EVENT_BUS.unsubscribe(this);
+		AffinityPlus.EVENT_BUS.unsubscribe(this);
 	}
 }

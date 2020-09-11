@@ -3,7 +3,7 @@ package com.gamesense.api.util.config;
 import com.gamesense.api.players.enemy.Enemies;
 import com.gamesense.api.players.friends.Friends;
 import com.gamesense.api.util.font.CFontRenderer;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.clickgui.ClickGUI;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.clickgui.frame.Frames;
@@ -84,7 +84,7 @@ public class LoadConfiguration{
 				String curLine = line.trim();
 				String bind = curLine.split(":")[0];
 				String value = curLine.split(":")[1];
-				GameSenseMod.getInstance().macroManager.addMacro(new Macro(Keyboard.getKeyIndex(bind), value.replace("_", " ")));
+				AffinityPlus.getInstance().macroManager.addMacro(new Macro(Keyboard.getKeyIndex(bind), value.replace("_", " ")));
 			}
 			br.close();
 		}
@@ -104,7 +104,7 @@ public class LoadConfiguration{
 			Friends.friends.clear();
 			String line;
 			while((line = br.readLine()) != null){
-				GameSenseMod.getInstance().friends.addFriend(line);
+				AffinityPlus.getInstance().friends.addFriend(line);
 			}
 			br.close();
 		}
@@ -165,12 +165,12 @@ public class LoadConfiguration{
 				String name = line.split(":")[0];
 				String size = line.split(":")[1];
 				int sizeInt = Integer.parseInt(size);
-				GameSenseMod.fontRenderer = new CFontRenderer(new Font(name, Font.PLAIN, sizeInt), true, false);
-				GameSenseMod.fontRenderer.setFont(new Font(name, Font.PLAIN, sizeInt));
-				GameSenseMod.fontRenderer.setAntiAlias(true);
-				GameSenseMod.fontRenderer.setFractionalMetrics(false);
-				GameSenseMod.fontRenderer.setFontName(name);
-				GameSenseMod.fontRenderer.setFontSize(sizeInt);
+				AffinityPlus.fontRenderer = new CFontRenderer(new Font(name, Font.PLAIN, sizeInt), true, false);
+				AffinityPlus.fontRenderer.setFont(new Font(name, Font.PLAIN, sizeInt));
+				AffinityPlus.fontRenderer.setAntiAlias(true);
+				AffinityPlus.fontRenderer.setFractionalMetrics(false);
+				AffinityPlus.fontRenderer.setFontName(name);
+				AffinityPlus.fontRenderer.setFontSize(sizeInt);
 			}
 			br.close();
 		}

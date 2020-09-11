@@ -1,6 +1,6 @@
 package com.gamesense.api.util.world;
 
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.api.event.events.PacketEvent;
 import me.zero.alpine.listener.EventHandler;
 import me.zero.alpine.listener.Listener;
@@ -20,7 +20,7 @@ public class TpsUtils{
 		nextIndex = 0;
 		timeLastTimeUpdate = -1L;
 		Arrays.fill(tickRates, 0.0F);
-		GameSenseMod.EVENT_BUS.subscribe(this);
+		AffinityPlus.EVENT_BUS.subscribe(this);
 	}
 
 	public static float getTickRate(){

@@ -3,7 +3,7 @@ package com.gamesense.api.event;
 import com.gamesense.api.event.events.PacketEvent;
 import com.gamesense.api.event.events.PlayerJoinEvent;
 import com.gamesense.api.event.events.PlayerLeaveEvent;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.command.CommandManager;
 import com.gamesense.client.module.ModuleManager;
@@ -26,8 +26,6 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-
-import java.awt.*;
 
 import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
@@ -66,7 +64,7 @@ public class EventProcessor {
 
 	@SubscribeEvent
 	public void onRender(RenderGameOverlayEvent.Post event) {
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 		if(event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR) {
 			//module onRender
 			ModuleManager.onRender();
@@ -80,7 +78,7 @@ public class EventProcessor {
 		   if(Keyboard.getEventKey() == 0 || Keyboard.getEventKey() == Keyboard.KEY_NONE) return;
 		  ModuleManager.onBind(Keyboard.getEventKey());
 			//Macro
-		   GameSenseMod.getInstance().macroManager.getMacros().forEach(m -> {
+		   AffinityPlus.getInstance().macroManager.getMacros().forEach(m -> {
 				if(m.getKey() == Keyboard.getEventKey())
 					m.onMacro();
 			});
@@ -90,7 +88,7 @@ public class EventProcessor {
 	@SubscribeEvent
 	public void onMouseInput(InputEvent.MouseInputEvent event){
 		if(Mouse.getEventButtonState())
-			GameSenseMod.EVENT_BUS.post(event);
+			AffinityPlus.EVENT_BUS.post(event);
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -111,62 +109,62 @@ public class EventProcessor {
 
 	@SubscribeEvent
 	public void onRenderScreen(RenderGameOverlayEvent.Text event) {
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 	}
 
 	@SubscribeEvent
 	public void onChatReceived(ClientChatReceivedEvent event){
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 	}
 
 	@SubscribeEvent
 	public void onAttackEntity(AttackEntityEvent event) {
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 	}
 
 	@SubscribeEvent
 	public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event){
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 	}
 
 	@SubscribeEvent
 	public void onDrawBlockHighlight(DrawBlockHighlightEvent event){
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 	}
 
 	@SubscribeEvent
-	public void onRenderBlockOverlay(RenderBlockOverlayEvent event){ GameSenseMod.EVENT_BUS.post(event); }
+	public void onRenderBlockOverlay(RenderBlockOverlayEvent event){ AffinityPlus.EVENT_BUS.post(event); }
 
 	@SubscribeEvent
 	public void onLivingDamage(LivingDamageEvent event){
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 	}
 	@SubscribeEvent
 	public void onLivingEntityUseItemFinish(LivingEntityUseItemEvent.Finish event) {
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 	}
 
 	@SubscribeEvent
 	public void onInputUpdate(InputUpdateEvent event){
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 	}
 
 	@SubscribeEvent
 	public void onLivingDeath(LivingDeathEvent event){
-		GameSenseMod.EVENT_BUS.post(event);}
+		AffinityPlus.EVENT_BUS.post(event);}
 
 	@SubscribeEvent
 	public void onPlayerPush(PlayerSPPushOutOfBlocksEvent event) {
-		GameSenseMod.EVENT_BUS.post(event);}
+		AffinityPlus.EVENT_BUS.post(event);}
 
 	@SubscribeEvent
 	public void onWorldUnload(WorldEvent.Unload event) {
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 	}
 
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
-		GameSenseMod.EVENT_BUS.post(event);
+		AffinityPlus.EVENT_BUS.post(event);
 	}
 
 	@EventHandler
@@ -180,7 +178,7 @@ public class EventProcessor {
 								String name = resolveName(playerData.getProfile().getId().toString());
 								if (name != null) {
 									if (mc.player != null && mc.player.ticksExisted >= 1000)
-										GameSenseMod.EVENT_BUS.post(new PlayerJoinEvent(name));
+										AffinityPlus.EVENT_BUS.post(new PlayerJoinEvent(name));
 								}
 							}).start();
 						}
@@ -193,7 +191,7 @@ public class EventProcessor {
 								final String name = resolveName(playerData.getProfile().getId().toString());
 								if (name != null) {
 									if (mc.player != null && mc.player.ticksExisted >= 1000)
-										GameSenseMod.EVENT_BUS.post(new PlayerLeaveEvent(name));
+										AffinityPlus.EVENT_BUS.post(new PlayerLeaveEvent(name));
 								}
 							}).start();
 						}
@@ -230,7 +228,7 @@ public class EventProcessor {
 	}
 
 	public void init(){
-		GameSenseMod.EVENT_BUS.subscribe(this);
+		AffinityPlus.EVENT_BUS.subscribe(this);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 }

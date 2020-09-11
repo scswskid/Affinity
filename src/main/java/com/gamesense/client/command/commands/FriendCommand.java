@@ -1,6 +1,6 @@
 package com.gamesense.client.command.commands;
 
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import com.gamesense.client.command.Command;
 import com.gamesense.api.players.friends.Friends;
@@ -24,7 +24,7 @@ public class FriendCommand extends Command{
 				return;
 			}
 			if (!Friends.isFriend(args[1])){
-				GameSenseMod.getInstance().friends.addFriend(args[1]);
+				AffinityPlus.getInstance().friends.addFriend(args[1]);
 				Command.sendClientMessage("Added " + args[1] + " to friends list");
 			}
 		}
@@ -34,7 +34,7 @@ public class FriendCommand extends Command{
 				return;
 			}
 			if (Friends.isFriend(args[1])){
-				GameSenseMod.getInstance().friends.delFriend(args[1]);
+				AffinityPlus.getInstance().friends.delFriend(args[1]);
 				Command.sendClientMessage("Removed " + args[1] + " from friends list");
 			}
 		}

@@ -1,7 +1,7 @@
 package com.gamesense.client.module.modules.misc;
 
 import com.gamesense.api.event.events.PacketEvent;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.module.Module;
 import me.zero.alpine.listener.EventHandler;
 import me.zero.alpine.listener.Listener;
@@ -73,12 +73,12 @@ public class AutoGG extends Module{
 
 	public void onEnable(){
 		this.targetedPlayers = new ConcurrentHashMap();
-		GameSenseMod.EVENT_BUS.subscribe(this);
+		AffinityPlus.EVENT_BUS.subscribe(this);
 	}
 
 	public void onDisable(){
 		this.targetedPlayers = null;
-		GameSenseMod.EVENT_BUS.unsubscribe(this);
+		AffinityPlus.EVENT_BUS.unsubscribe(this);
 	}
 
 	public void onUpdate(){

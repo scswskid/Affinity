@@ -5,7 +5,7 @@ import com.gamesense.api.settings.Setting;
 import com.gamesense.api.util.font.FontUtils;
 import com.gamesense.api.util.world.TpsUtils;
 import com.gamesense.api.util.GSColor;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.module.Module;
 import com.gamesense.client.module.ModuleManager;
 import com.gamesense.client.module.modules.combat.AutoCrystal;
@@ -27,7 +27,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -146,7 +145,7 @@ public class HUD extends Module {
 		}
 
 		if (Watermark.getValue()) {
-			FontUtils.drawStringWithShadow(customFont.getValue(), "GameSense " + GameSenseMod.MODVER, 0, 0, c);
+			FontUtils.drawStringWithShadow(customFont.getValue(), "GameSense " + AffinityPlus.MODVER, 0, 0, c);
 		}
 
 		if (Welcomer.getValue()) {

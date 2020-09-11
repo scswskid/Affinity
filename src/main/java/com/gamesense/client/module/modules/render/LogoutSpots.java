@@ -6,11 +6,10 @@ import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.util.render.GameSenseTessellator;
 import com.gamesense.api.util.GSColor;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.module.Module;
-import com.gamesense.client.module.ModuleManager;
-import com.gamesense.client.module.modules.hud.ColorMain;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -108,11 +107,11 @@ public class LogoutSpots extends Module {
 	public void onEnable(){
 		lastTickEntities = new ArrayList<>();
 		loggedPlayers.clear();
-		GameSenseMod.EVENT_BUS.subscribe(this);
+		AffinityPlus.EVENT_BUS.subscribe(this);
 	}
 
 	public void onDisable() {
-		GameSenseMod.EVENT_BUS.unsubscribe(this);
+		AffinityPlus.EVENT_BUS.unsubscribe(this);
 	}
 
 	private void drawNametag(Entity entityIn, String t) {

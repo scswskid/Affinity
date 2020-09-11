@@ -1,6 +1,6 @@
 package com.gamesense.api.mixin.mixins;
 
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.api.event.events.PlayerMoveEvent;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -19,7 +19,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer{
 	@Redirect(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;move(Lnet/minecraft/entity/MoverType;DDD)V"))
 	public void move(AbstractClientPlayer player, MoverType type, double x, double y, double z){
 		PlayerMoveEvent moveEvent = new PlayerMoveEvent(type, x, y, z);
-		GameSenseMod.EVENT_BUS.post(moveEvent);
+		AffinityPlus.EVENT_BUS.post(moveEvent);
 		if (moveEvent.isCancelled()){
 		}
 		super.move(type, moveEvent.x, moveEvent.y, moveEvent.z);

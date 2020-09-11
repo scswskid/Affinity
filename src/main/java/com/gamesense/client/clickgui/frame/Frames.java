@@ -1,7 +1,7 @@
 package com.gamesense.client.clickgui.frame;
 
 import com.gamesense.api.util.font.FontUtils;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.clickgui.ClickGUI;
 import com.gamesense.client.module.Module;
 import com.gamesense.client.module.ModuleManager;
@@ -72,7 +72,7 @@ public class Frames {
 
     public void renderGUIFrame(final FontRenderer fontRenderer){
         Renderer.drawRectGradient(this.x, this.y, this.x + this.width, this.y + this.barHeight, Renderer.getMainColor(), Renderer.getTransColor(false));
-        if(font) GameSenseMod.fontRenderer.drawStringWithShadow(this.category.name(), (float)(this.x + 2), (float)(this.y + 3), Renderer.getFontColor());
+        if(font) AffinityPlus.fontRenderer.drawStringWithShadow(this.category.name(), (float)(this.x + 2), (float)(this.y + 3), Renderer.getFontColor());
         else FontUtils.drawStringWithShadow(HUD.customFont.getValue(), this.category.name(), this.x + 2, this.y + 3, Renderer.getFontColor());
         if (this.open && !this.guicomponents.isEmpty()){
             for (final Component component : this.guicomponents){

@@ -2,7 +2,7 @@ package com.gamesense.client.clickgui.frame;
 
 import com.gamesense.api.settings.Setting;
 import com.gamesense.api.util.font.FontUtils;
-import com.gamesense.client.GameSenseMod;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.clickgui.buttons.*;
 import com.gamesense.client.module.Module;
 import com.gamesense.client.module.modules.hud.ClickGuiModule;
@@ -34,8 +34,8 @@ public class Buttons extends Component {
 		this.subcomponents = new ArrayList<Component>();
 		this.open = false;
 		int opY = offset + 16;
-		if (GameSenseMod.getInstance().settingsManager.getSettingsForMod(mod) != null && !GameSenseMod.getInstance().settingsManager.getSettingsForMod(mod).isEmpty()) {
-			for (final Setting s : GameSenseMod.getInstance().settingsManager.getSettingsForMod(mod)) {
+		if (AffinityPlus.getInstance().settingsManager.getSettingsForMod(mod) != null && !AffinityPlus.getInstance().settingsManager.getSettingsForMod(mod).isEmpty()) {
+			for (final Setting s : AffinityPlus.getInstance().settingsManager.getSettingsForMod(mod)) {
 				switch (s.getType()) {
 					case MODE:
 						this.subcomponents.add(new ModeComponent((Setting.Mode)s, this, mod, opY));
