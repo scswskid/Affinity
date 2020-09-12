@@ -23,9 +23,9 @@ import net.minecraft.util.math.Vec3d;
 import static com.gamesense.api.util.world.BlockUtils.canBeClicked;
 import static com.gamesense.api.util.world.BlockUtils.faceVectorPacketInstant;
 
-public class AutoFeetPlace extends Module{
+public class Surround extends Module{
 
-	public AutoFeetPlace(){super("AutoFeetPlace", Category.Combat);}
+	public Surround(){super("Surround", Category.Combat);}
 
 	Setting.Boolean triggerable;
 	Setting.Integer timeoutTicks;
