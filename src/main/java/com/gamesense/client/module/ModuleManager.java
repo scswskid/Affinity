@@ -45,7 +45,7 @@ public class ModuleManager {
 		addMod(new NoSwing());
 		addMod(new PortalGodMode());
 		//Movement
-		addMod(new HoleTP());
+		addMod(new FastFall());
 		addMod(new PlayerTweaks());
 		addMod(new ReverseStep());
 		addMod(new Speed());
