@@ -38,7 +38,7 @@ public class ModuleManager {
 		addMod(new OffhandGap());
 		addMod(new SelfTrap());
 		//Exploits
-		addMod(new CoordExploit());
+		addMod(new PopbobCoordExploit());
 		addMod(new FastBreak());
 		addMod(new LiquidInteract());
 		addMod(new NoInteract());
