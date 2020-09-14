@@ -1,13 +1,12 @@
-# GameSense Client
+# Affinity+ Client
 
-Discord: https://discord.gg/xfgPw63
+Discord: https://discord.gg/bFMFbc
 
 Current version: 2.1.2
 
 Developers:
--Cyber
--Hoosiers
--lukflug
--auburnhud2
+-programmer
+-jimbo
+-scsw
 
--Make sure to check the credits too!
+-sehcs dupe
