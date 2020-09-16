@@ -4,6 +4,7 @@ import com.gamesense.api.util.world.BlockUtils;
 import com.gamesense.api.util.world.EntityUtil;
 import com.gamesense.client.module.*;
 import com.gamesense.api.settings.*;
+import com.gamesense.client.module.Module;
 import net.minecraft.entity.player.*;
 import net.minecraft.util.math.*;
 import net.minecraft.util.*;
@@ -14,7 +15,7 @@ import com.gamesense.api.players.friends.*;
 import com.gamesense.api.util.*;
 import java.util.*;
 
-public class AutoWeb extends Module{
+public class AutoWeb extends Module {
 
 	Setting.Boolean rotate;
 	Setting.Double range;

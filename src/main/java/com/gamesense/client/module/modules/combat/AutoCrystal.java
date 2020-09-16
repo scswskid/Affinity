@@ -154,11 +154,11 @@ public class AutoCrystal extends Module {
         isActive = false;
         isBreaking = false;
         isPlacing = false;
-        if (mc.player == null || mc.player.isDead) return; // bruh
+        if (mc.player == null || mc.player.isDead) return;
         EntityEnderCrystal crystal = mc.world.loadedEntityList.stream()
                 .filter(entity -> entity instanceof EntityEnderCrystal)
                 .filter(e -> mc.player.getDistance(e) <= range.getValue())
-                .filter(e -> crystalCheck(e))
+                .filter(this::crystalCheck)
                 .map(entity -> (EntityEnderCrystal) entity)
                 .min(Comparator.comparing(c -> mc.player.getDistance(c)))
                 .orElse(null);

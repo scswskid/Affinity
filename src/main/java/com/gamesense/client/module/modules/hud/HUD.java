@@ -145,7 +145,7 @@ public class HUD extends Module {
 		}
 
 		if (Watermark.getValue()) {
-			FontUtils.drawStringWithShadow(customFont.getValue(), "GameSense " + AffinityPlus.MODVER, 0, 0, c);
+			FontUtils.drawStringWithShadow(customFont.getValue(), "Affinity+ " + AffinityPlus.MODVER, 0, 0, c);
 		}
 
 		if (Welcomer.getValue()) {
@@ -176,11 +176,11 @@ public class HUD extends Module {
 						.map(entity -> (EntityOtherPlayerMP) entity)
 						.min(Comparator.comparing(cl -> mc.player.getDistance(cl)))
 						.orElse(null);
-				final AutoCrystal a = (AutoCrystal) ModuleManager.getModuleByName("AutocrystalGS");
+				final AutoCrystal a = (AutoCrystal) ModuleManager.getModuleByName("Autocrystal");
 				this.surroundOffset = new BlockPos[]{new BlockPos(0, 0, -1), new BlockPos(1, 0, 0), new BlockPos(0, 0, 1), new BlockPos(-1, 0, 0)};
 				final List<EntityPlayer> entities = new ArrayList<EntityPlayer>(mc.world.playerEntities.stream().filter(entityPlayer -> !Friends.isFriend(entityPlayer.getName())).collect(Collectors.toList()));
 				if (Type.getValue().equalsIgnoreCase("PvP")) {
-					FontUtils.drawStringWithShadow(customFont.getValue(), "gamesense.cc", infox.getValue(), infoy.getValue(), c);
+					FontUtils.drawStringWithShadow(customFont.getValue(), "Affinity+", infox.getValue(), infoy.getValue(), c);
 					if (players != null && mc.player.getDistance(players) <= AutoCrystal.range.getValue()) {
 						FontUtils.drawStringWithShadow(customFont.getValue(), "HTR", infox.getValue(), infoy.getValue() + 10, on);
 					} else {
@@ -228,7 +228,7 @@ public class HUD extends Module {
 				}
 			} else if (Type.getValue().equalsIgnoreCase("Combat")) {
 				FontUtils.drawStringWithShadow(customFont.getValue(), " ", infox.getValue(), infoy.getValue(), c);
-				if (ModuleManager.isModuleEnabled("AutoCrystalGS")) {
+				if (ModuleManager.isModuleEnabled("AutoCrystal")) {
 					FontUtils.drawStringWithShadow(customFont.getValue(), "AC: ENBL", infox.getValue(), infoy.getValue(), on);
 				} else {
 					FontUtils.drawStringWithShadow(customFont.getValue(), "AC: DSBL", infox.getValue(), infoy.getValue(), off);

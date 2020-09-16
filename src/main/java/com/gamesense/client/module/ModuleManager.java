@@ -34,6 +34,7 @@ public class ModuleManager {
 		addMod(new FastBow());
 		addMod(new HoleFill());
 		addMod(new KillAura());
+		addMod(new Auto32K());
 		addMod(new OffhandCrystal());
 		addMod(new OffhandGap());
 		addMod(new SelfTrap());
@@ -59,7 +60,7 @@ public class ModuleManager {
 		addMod(new ChatModifier());
 		addMod(new ChatSuffix());
 		addMod(new FastPlace());
-		addMod(new HoosiersDupe());
+		addMod(new SkiddaOnBottomDupe());
 		addMod(new MCF());
 		addMod(new MultiTask());
 		addMod(new NoEntityTrace());

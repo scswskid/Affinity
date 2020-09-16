@@ -9,6 +9,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
@@ -22,6 +23,7 @@ public class OffhandGap extends Module{
 	boolean returnI;
 	Item item;
 	Setting.Integer health;
+	Setting.Boolean swordGap;
 
 	public OffhandGap(){
 		super("OffhandGap", Category.Combat);
@@ -32,12 +34,10 @@ public class OffhandGap extends Module{
 	@Override
 	public void setup(){
 		health = registerInteger("Health", "Health", 15, 0, 36);
+		swordGap = registerBoolean("Sword Gap", "swordGap", true);
 	}
 
 	public void onDisable(){
-		if (OffhandCrystal.mc.currentScreen instanceof GuiContainer){
-			return;
-		}
 		this.crystals = OffhandCrystal.mc.player.inventory.mainInventory.stream().filter(itemStack -> itemStack.getItem() == Items.TOTEM_OF_UNDYING).mapToInt(ItemStack::getCount).sum();
 		if (OffhandCrystal.mc.player.getHeldItemOffhand().getItem() != Items.TOTEM_OF_UNDYING){
 			if (this.crystals == 0){
@@ -79,6 +79,7 @@ public class OffhandGap extends Module{
 			OffhandCrystal.mc.playerController.windowClick(0, (t < 9) ? (t + 36) : t, 0, ClickType.PICKUP, OffhandCrystal.mc.player);
 			this.returnI = false;
 		}
+		if (this.swordGap.getValue() && mc.player.getHeldItem(EnumHand.MAIN_HAND).getItem() == Items.DIAMOND_SWORD) {}
 		this.totems = OffhandCrystal.mc.player.inventory.mainInventory.stream().filter(itemStack -> itemStack.getItem() == Items.TOTEM_OF_UNDYING).mapToInt(ItemStack::getCount).sum();
 		this.crystals = OffhandCrystal.mc.player.inventory.mainInventory.stream().filter(itemStack -> itemStack.getItem() == this.item).mapToInt(ItemStack::getCount).sum();
 		if (this.shouldTotem() && OffhandCrystal.mc.player.getHeldItemOffhand().getItem() == Items.TOTEM_OF_UNDYING){

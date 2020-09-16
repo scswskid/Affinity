@@ -1,7 +1,10 @@
 package com.gamesense.client.module.modules.combat;
 
 import com.gamesense.api.settings.Setting;
+import com.gamesense.api.settings.SettingsManager;
+import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.module.Module;
+import com.gamesense.client.module.ModuleManager;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityEnderCrystal;
@@ -9,6 +12,7 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
@@ -62,9 +66,9 @@ public class OffhandCrystal extends Module{
 	@Override
 	public void onUpdate(){
 		this.item = Items.END_CRYSTAL;
-		if (OffhandCrystal.mc.currentScreen instanceof GuiContainer){
-			return;
-		}
+		Setting.Boolean swordGap = (Setting.Boolean) AffinityPlus.getInstance().settingsManager.getSettingByName("swordGap");
+		if (swordGap.getValue() && mc.player.getHeldItem(EnumHand.MAIN_HAND).getItem() == Items.DIAMOND_SWORD) return;
+
 		if (this.returnI){
 			int t = -1;
 			for (int i = 0; i < 45; i++){
