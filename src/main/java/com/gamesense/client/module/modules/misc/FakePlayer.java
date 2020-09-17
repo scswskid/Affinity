@@ -12,12 +12,12 @@ import java.util.UUID;
 
 @Mod.EventBusSubscriber
 public class FakePlayer extends Module {
+    EntityOtherPlayerMP fakePlayer;
+
     public FakePlayer() {
         super("FakePlayer", Category.Misc);
         MinecraftForge.EVENT_BUS.register(this);
     }
-
-    EntityOtherPlayerMP fakePlayer;
 
     @Override
     protected void onEnable() {
@@ -38,6 +38,7 @@ public class FakePlayer extends Module {
     protected void onDisable() {
         try {
             mc.world.removeEntity(fakePlayer);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 }

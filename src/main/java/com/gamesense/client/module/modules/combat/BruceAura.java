@@ -4,27 +4,23 @@ import com.gamesense.api.players.friends.Friends;
 import com.gamesense.api.settings.Setting;
 import com.gamesense.api.util.world.EntityUtil;
 import com.gamesense.client.module.Module;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumHand;
-import net.minecraft.client.Minecraft;
-import net.minecraft.init.Items;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
 public class BruceAura extends Module {
-    public BruceAura() {
-        super("Bruce Aura", Category.Combat);
-    }
-
-    private Setting.Boolean attackPlayers = registerBoolean("Players","Players", true);
-    private Setting.Boolean attackMobs = registerBoolean("Mobs","Mobs", false);
+    private Setting.Boolean attackPlayers = registerBoolean("Players", "Players", true);
+    private Setting.Boolean attackMobs = registerBoolean("Mobs", "Mobs", false);
     private Setting.Boolean attackAnimals = registerBoolean("Animals", "Animals", false);
     private Setting.Double hitRange = registerDouble("Hit Range", "HitRange", 5.5d, 0.0d, 6.0d);
     private Setting.Boolean ignoreWalls = registerBoolean("Ignore Walls", "IgnoreWalls", true);
@@ -39,15 +35,10 @@ public class BruceAura extends Module {
             "AXE",
             "Only32k"
     ), "SWORD");
-
     private int waitCounter;
 
-    private enum SwitchMode {
-        NONE, ALL, Only32k
-    }
-
-    private enum HitMode {
-        SWORD, AXE, Only32k
+    public BruceAura() {
+        super("Bruce Aura", Category.Combat);
     }
 
     @Override
@@ -73,8 +64,7 @@ public class BruceAura extends Module {
             if (waitCounter < waitTick.getValue()) {
                 waitCounter++;
                 return;
-            }
-            else {
+            } else {
                 waitCounter = 0;
             }
         }
@@ -197,5 +187,13 @@ public class BruceAura extends Module {
 
     private boolean canEntityFeetBeSeen(Entity entityIn) {
         return mc.world.rayTraceBlocks(new Vec3d(mc.player.posX, mc.player.posY + mc.player.getEyeHeight(), mc.player.posZ), new Vec3d(entityIn.posX, entityIn.posY, entityIn.posZ), false, true, false) == null;
+    }
+
+    private enum SwitchMode {
+        NONE, ALL, Only32k
+    }
+
+    private enum HitMode {
+        SWORD, AXE, Only32k
     }
 }

@@ -14,20 +14,16 @@ import net.minecraft.util.math.BlockPos;
 import java.util.Arrays;
 
 public class SmartOffhand extends Module {
+    Setting.Mode switch_mode = registerMode("Mode", "OffhandOffhand", Arrays.asList("Totem", "Crystal", "Gapple"), "Totem");
+    Setting.Integer totem_switch = registerInteger("Min Offhand HP", "OffhandTotemHP", 16, 0, 36);
+    Setting.Boolean gapple_in_hole = registerBoolean("Gapple In Hole", "OffhandGapple", true);
+    Setting.Integer gapple_hole_hp = registerInteger("Gapple Hole HP", "OffhandGappleHP", 8, 0, 36);
+    Setting.Boolean delay = registerBoolean("Delay", "OffhandDelay", false);
+    private boolean switching = false;
+    private int last_slot;
     public SmartOffhand() {
         super("Smart Offhand", Category.Combat);
     }
-
-    Setting.Mode switch_mode = registerMode("Mode", "OffhandOffhand", Arrays.asList("Totem", "Crystal", "Gapple"), "Totem");
-    Setting.Integer totem_switch = registerInteger("Min Offhand HP", "OffhandTotemHP", 16, 0, 36);
-
-    Setting.Boolean gapple_in_hole = registerBoolean("Gapple In Hole", "OffhandGapple", true);
-    Setting.Integer gapple_hole_hp = registerInteger("Gapple Hole HP", "OffhandGappleHP", 8, 0, 36);
-
-    Setting.Boolean delay = registerBoolean("Delay", "OffhandDelay", false);
-
-    private boolean switching = false;
-    private int last_slot;
 
     @Override
     public void onUpdate() {
@@ -42,7 +38,7 @@ public class SmartOffhand extends Module {
 
             if (hp > totem_switch.getValue()) {
                 if (switch_mode.getValue().equals("Crystal") && ModuleManager.isModuleEnabled("AutoCrystal")) {
-                    swap_items(get_item_slot(Items.END_CRYSTAL),0);
+                    swap_items(get_item_slot(Items.END_CRYSTAL), 0);
                     return;
                 }
                 if (gapple_in_hole.getValue() && hp > gapple_hole_hp.getValue() && is_in_hole()) {
@@ -58,7 +54,7 @@ public class SmartOffhand extends Module {
                     return;
                 }
                 if (switch_mode.getValue().equals("Crystal") && !ModuleManager.isModuleEnabled("AutoCrystal")) {
-                    swap_items(get_item_slot(Items.TOTEM_OF_UNDYING),0);
+                    swap_items(get_item_slot(Items.TOTEM_OF_UNDYING), 0);
                     return;
                 }
             } else {
@@ -108,9 +104,9 @@ public class SmartOffhand extends Module {
 
     private int get_item_slot(Item input) {
         if (input == mc.player.getHeldItemOffhand().getItem()) return -1;
-        for(int i = 36; i >= 0; i--) {
+        for (int i = 36; i >= 0; i--) {
             final Item item = mc.player.inventory.getStackInSlot(i).getItem();
-            if(item == input) {
+            if (item == input) {
                 if (i < 9) {
                     if (input == Items.GOLDEN_APPLE) {
                         return -1;

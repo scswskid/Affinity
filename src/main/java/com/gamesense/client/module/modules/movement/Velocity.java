@@ -12,11 +12,6 @@ public class Velocity extends Module {
     Setting.Double xMultiplier = registerDouble("X Multiplier", "xMultiplier", 0.0, 0.0, 1.0);
     Setting.Double yMultiplier = registerDouble("Y Multiplier", "yMultiplier", 0.0, 0.0, 1.0);
     Setting.Double zMultiplier = registerDouble("Z Multiplier", "zMultiplier", 0.0, 0.0, 1.0);
-
-    public Velocity() {
-        super("Velocity", Category.Movement);
-    }
-
     @EventHandler
     Listener<PacketEvent.Receive> listener = new Listener<>(event -> {
         if (!ModuleManager.isModuleEnabled(this))
@@ -32,4 +27,8 @@ public class Velocity extends Module {
         packet.motionY *= yMultiplier.getValue();
         packet.motionZ *= zMultiplier.getValue();
     });
+
+    public Velocity() {
+        super("Velocity", Category.Movement);
+    }
 }
