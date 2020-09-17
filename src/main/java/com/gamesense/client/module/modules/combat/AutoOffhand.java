@@ -94,9 +94,8 @@ public final class AutoOffhand extends Module {
         }
     }
 
-    @EventHandler
-    private Listener<PlayerEvent> OnPlayerUpdate = new Listener<>(p_Event ->
-    {
+    @Override
+    public void onUpdate() {
         if (stopInGUI.getValue()) {
             if (mc.currentScreen != null && (!(mc.currentScreen instanceof GuiInventory)))
             return;
@@ -127,7 +126,7 @@ public final class AutoOffhand extends Module {
 
         /// If we meet the required health
         SwitchOffHandIfNeed(Mode.getValue());
-    });
+    }
 
     public static float GetHealthWithAbsorption() {
         return mc.player.getHealth() + mc.player.getAbsorptionAmount();

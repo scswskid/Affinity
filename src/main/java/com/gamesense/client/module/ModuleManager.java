@@ -56,6 +56,7 @@ public class ModuleManager {
 		addMod(new Speed());
 		addMod(new Sprint());
 		addMod(new Step());
+		addMod(new Velocity());
 		//Misc
 		addMod(new Announcer());
 		addMod(new AutoGG());
@@ -65,6 +66,7 @@ public class ModuleManager {
 		addMod(new ChatSuffix());
 		addMod(new FastPlace());
 		addMod(new SkiddaOnBottomDupe());
+		addMod(new FakePlayer());
 		addMod(new MCF());
 		addMod(new MultiTask());
 		addMod(new NoEntityTrace());
