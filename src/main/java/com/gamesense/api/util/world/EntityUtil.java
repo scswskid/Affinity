@@ -40,6 +40,10 @@ public class EntityUtil{
 		return e instanceof EntityLivingBase;
 	}
 
+	public static BlockPos GetLocalPlayerPosFloored() {
+		return new BlockPos(Math.floor(mc.player.posX), Math.floor(mc.player.posY), Math.floor(mc.player.posZ));
+	}
+
 	public static boolean isFakeLocalPlayer(Entity entity){
 		return entity != null && entity.getEntityId() == -100 && Wrapper.getPlayer() != entity;
 	}

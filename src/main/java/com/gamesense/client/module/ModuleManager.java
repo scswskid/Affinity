@@ -35,8 +35,12 @@ public class ModuleManager {
 		addMod(new HoleFill());
 		addMod(new KillAura());
 		addMod(new Auto32K());
+		addMod(new BruceAura());
+		addMod(new AutoOffhand());
+		addMod(new SmartOffhand());
 		addMod(new OffhandCrystal());
 		addMod(new OffhandGap());
+		addMod(new FootXp());
 		addMod(new SelfTrap());
 		//Exploits
 		addMod(new PopbobCoordExploit());

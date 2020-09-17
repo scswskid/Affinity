@@ -155,122 +155,6 @@ public class AutoCrystal extends Module {
         isBreaking = false;
         isPlacing = false;
         if (mc.player == null || mc.player.isDead) return;
-        EntityEnderCrystal crystal = mc.world.loadedEntityList.stream()
-                .filter(entity -> entity instanceof EntityEnderCrystal)
-                .filter(e -> mc.player.getDistance(e) <= range.getValue())
-                .filter(this::crystalCheck)
-                .map(entity -> (EntityEnderCrystal) entity)
-                .min(Comparator.comparing(c -> mc.player.getDistance(c)))
-                .orElse(null);
-        if (explode.getValue() && crystal != null) {
-
-            if (antiSuicide.getValue()){
-                if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < antiSuicideValue.getValue()){
-                    return;
-                }
-            }
-            // Walls Range
-            if (!mc.player.canEntityBeSeen(crystal) && mc.player.getDistance(crystal) > walls.getValue()){
-                return;
-            }
-
-            // Anti Weakness
-            if (antiWeakness.getValue() && mc.player.isPotionActive(MobEffects.WEAKNESS)) {
-                if (!isAttacking) {
-                    // save initial player hand
-                    oldSlot = mc.player.inventory.currentItem;
-                    isAttacking = true;
-                }
-                // search for sword and tools in hotbar
-                newSlot = -1;
-                for (int i = 0; i < 9; i++) {
-                    ItemStack stack = mc.player.inventory.getStackInSlot(i);
-                    if (stack == ItemStack.EMPTY) {
-                        continue;
-                    }
-                    if ((stack.getItem() instanceof ItemSword)) {
-                        newSlot = i;
-                        break;
-                    }
-                    if ((stack.getItem() instanceof ItemTool)) {
-                        newSlot = i;
-                        break;
-                    }
-                }
-                // check if any swords or tools were found
-                if (newSlot != -1) {
-                    mc.player.inventory.currentItem = newSlot;
-                    switchCooldown = true;
-                }
-            }
-
-            if (System.nanoTime() / 1000000L - breakSystemTime >= 420 - attackSpeed.getValue() * 20) {
-
-                isActive = true;
-                isBreaking = true;
-
-                if (rotate.getValue()) {
-                    lookAtPacket(crystal.posX, crystal.posY, crystal.posZ, mc.player);
-                }
-
-                /**
-                 * @Author Hoosiers
-                 * Pretty WIP, but it seems to make the CA much faster
-                 */
-                mc.playerController.attackEntity(mc.player, crystal);
-                if (crystal == null) {
-                    return;
-                }
-                if (handBreak.getValue().equalsIgnoreCase("Offhand") && !mc.player.getHeldItemOffhand().isEmpty) {
-                    mc.player.swingArm(EnumHand.OFF_HAND);
-                    if (cancelCrystal.getValue()) {
-                        crystal.setDead();
-                        mc.world.removeAllEntities();
-                        mc.world.getLoadedEntityList();
-                    }
-
-                } else {
-                    mc.player.swingArm(EnumHand.MAIN_HAND);
-                    if (cancelCrystal.getValue()) {
-                        crystal.setDead();
-                        mc.world.removeAllEntities();
-                        mc.world.getLoadedEntityList();
-                    }
-
-                }
-                if (handBreak.getValue().equalsIgnoreCase("Both")) {
-                    mc.player.swingArm(EnumHand.MAIN_HAND);
-                    mc.player.swingArm(EnumHand.OFF_HAND);
-                    if (cancelCrystal.getValue()) {
-                        crystal.setDead();
-                        mc.world.removeAllEntities();
-                        mc.world.getLoadedEntityList();
-                    }
-
-                }
-                if (cancelCrystal.getValue()) {
-                    crystal.setDead();
-                    mc.world.removeAllEntities();
-                    mc.world.getLoadedEntityList();
-                    breakSystemTime = System.nanoTime() / 1000000L;
-                }
-
-                isActive = false;
-                isBreaking = false;
-            }
-            if (!singlePlace.getValue()) {
-                return;
-            }
-        } else {
-            resetRotation();
-            if (oldSlot != -1) {
-                mc.player.inventory.currentItem = oldSlot;
-                oldSlot = -1;
-            }
-            isAttacking = false;
-            isActive = false;
-            isBreaking = false;
-        }
 
         int crystalSlot = mc.player.getHeldItemMainhand().getItem() == Items.END_CRYSTAL ? mc.player.inventory.currentItem : -1;
         if (crystalSlot == -1) {
@@ -404,6 +288,23 @@ public class AutoCrystal extends Module {
                                 double b;
                                 do {
                                     if (!var11.hasNext()) {
+                                        EntityEnderCrystal crystal = mc.world.loadedEntityList.stream()
+                                                .filter(myCrystal -> myCrystal instanceof EntityEnderCrystal)
+                                                .filter(e -> mc.player.getDistance(e) <= range.getValue())
+                                                .filter(this::crystalCheck)
+                                                .map(myCrystal -> (EntityEnderCrystal) myCrystal)
+                                                .min(Comparator.comparing(c -> mc.player.getDistance(c)))
+                                                .orElse(null);
+                                        if (explode.getValue() && crystal != null) explodeCrystal(crystal); else {
+                                            resetRotation();
+                                            if (oldSlot != -1) {
+                                                mc.player.inventory.currentItem = oldSlot;
+                                                oldSlot = -1;
+                                            }
+                                            isAttacking = false;
+                                            isActive = false;
+                                            isBreaking = false;
+                                        }
                                         continue label164;
                                     }
 
@@ -430,6 +331,107 @@ public class AutoCrystal extends Module {
                 q = blockPos;
                 renderEnt = entity;
             }
+        }
+    }
+
+    public void explodeCrystal(EntityEnderCrystal crystal) {
+
+        if (antiSuicide.getValue()){
+            if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < antiSuicideValue.getValue()){
+                return;
+            }
+        }
+        // Walls Range
+        if (!mc.player.canEntityBeSeen(crystal) && mc.player.getDistance(crystal) > walls.getValue()){
+            return;
+        }
+
+        // Anti Weakness
+        if (antiWeakness.getValue() && mc.player.isPotionActive(MobEffects.WEAKNESS)) {
+            if (!isAttacking) {
+                // save initial player hand
+                oldSlot = mc.player.inventory.currentItem;
+                isAttacking = true;
+            }
+            // search for sword and tools in hotbar
+            newSlot = -1;
+            for (int i = 0; i < 9; i++) {
+                ItemStack stack = mc.player.inventory.getStackInSlot(i);
+                if (stack == ItemStack.EMPTY) {
+                    continue;
+                }
+                if ((stack.getItem() instanceof ItemSword)) {
+                    newSlot = i;
+                    break;
+                }
+                if ((stack.getItem() instanceof ItemTool)) {
+                    newSlot = i;
+                    break;
+                }
+            }
+            // check if any swords or tools were found
+            if (newSlot != -1) {
+                mc.player.inventory.currentItem = newSlot;
+                switchCooldown = true;
+            }
+        }
+
+        if (System.nanoTime() / 1000000L - breakSystemTime >= 420 - attackSpeed.getValue() * 20) {
+
+            isActive = true;
+            isBreaking = true;
+
+            if (rotate.getValue()) {
+                lookAtPacket(crystal.posX, crystal.posY, crystal.posZ, mc.player);
+            }
+
+            /**
+             * @Author Hoosiers
+             * Pretty WIP, but it seems to make the CA much faster
+             */
+            mc.playerController.attackEntity(mc.player, crystal);
+            if (crystal == null) {
+                return;
+            }
+            if (handBreak.getValue().equalsIgnoreCase("Offhand") && !mc.player.getHeldItemOffhand().isEmpty) {
+                mc.player.swingArm(EnumHand.OFF_HAND);
+                if (cancelCrystal.getValue()) {
+                    crystal.setDead();
+                    mc.world.removeAllEntities();
+                    mc.world.getLoadedEntityList();
+                }
+
+            } else {
+                mc.player.swingArm(EnumHand.MAIN_HAND);
+                if (cancelCrystal.getValue()) {
+                    crystal.setDead();
+                    mc.world.removeAllEntities();
+                    mc.world.getLoadedEntityList();
+                }
+
+            }
+            if (handBreak.getValue().equalsIgnoreCase("Both")) {
+                mc.player.swingArm(EnumHand.MAIN_HAND);
+                mc.player.swingArm(EnumHand.OFF_HAND);
+                if (cancelCrystal.getValue()) {
+                    crystal.setDead();
+                    mc.world.removeAllEntities();
+                    mc.world.getLoadedEntityList();
+                }
+
+            }
+            if (cancelCrystal.getValue()) {
+                crystal.setDead();
+                mc.world.removeAllEntities();
+                mc.world.getLoadedEntityList();
+                breakSystemTime = System.nanoTime() / 1000000L;
+            }
+
+            isActive = false;
+            isBreaking = false;
+        }
+        if (!singlePlace.getValue()) {
+            return;
         }
     }
 
