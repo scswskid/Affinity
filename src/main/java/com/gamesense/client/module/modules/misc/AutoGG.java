@@ -1,6 +1,7 @@
 package com.gamesense.client.module.modules.misc;
 
 import com.gamesense.api.event.events.PacketEvent;
+import com.gamesense.api.settings.Setting;
 import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.module.Module;
 import me.zero.alpine.listener.EventHandler;
@@ -12,14 +13,20 @@ import net.minecraft.network.play.client.CPacketChatMessage;
 import net.minecraft.network.play.client.CPacketUseEntity;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class AutoGG extends Module{
+public class AutoGG extends Module {
 	public static AutoGG INSTANCE;
+	public final Setting.Mode customMessage = registerMode("Custom Message", "customMessage", Arrays.asList(
+			"{name} ez'd by Affinity+!",
+			"Hey, {name}! you just got fucked in the ass by Affinity+!",
+			"A no name, also known as {name} just got shit on by Affinity+!",
+			"You just got cucked by the one and only Affinity+, {name}!",
+			"EZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+			"RANDOM"
+	), "RANDOM");
+	public final Setting.Boolean greenText = registerBoolean("Green Text", "greenText", true);
 
 	public AutoGG(){
 		super("AutoGG", Category.Misc);
@@ -120,11 +127,7 @@ public class AutoGG extends Module{
 		targetedPlayers.remove(name);
 		if (index >= (AutoGgMessages.size() - 1)) index = -1;
 		index++;
-		String message;
-		if (AutoGgMessages.size() > 0)
-			message = AutoGgMessages.get(index);
-		else
-			message = "gg";
+		String message = customMessage.getValue().equals("RANDOM") ? "" : customMessage.getValue(); //TODO random ez
 
 		String messageSanitized = message.replaceAll("ยง", "").replace("{name}", name);
 		if (messageSanitized.length() > 255){
