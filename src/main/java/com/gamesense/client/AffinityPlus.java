@@ -34,7 +34,8 @@ public class AffinityPlus {
     public static final String MODVER = "v0.0.1";
     public static final String FORGENAME = "Affinity Plus";
     public static final EventBus EVENT_BUS = new EventManager();
-    public static String MODNAME = "Affinity+";
+    public static final String MODNAME = "Affinity+";
+    public static final String DISCORDAPPID = "756374885139218473";
     public static final Logger log = LogManager.getLogger(MODNAME);
     public static CFontRenderer fontRenderer;
     public static Enemies enemies;

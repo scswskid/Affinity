@@ -64,6 +64,7 @@ public class ModuleManager {
         addMod(new AutoTool());
         addMod(new ChatModifier());
         addMod(new ChatSuffix());
+        //addMod(new DiscordRPCModule()); TODO fix DiscordRPCModule.java and uncomment this
         addMod(new FastPlace());
         addMod(new SkiddaOnBottomDupe());
         addMod(new FakePlayer());
