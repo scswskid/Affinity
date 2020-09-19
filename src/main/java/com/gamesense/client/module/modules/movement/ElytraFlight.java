@@ -13,13 +13,21 @@ import java.util.Arrays;
 
 @Mod.EventBusSubscriber
 public class ElytraFlight extends Module {
-    private final Setting.Double speed = registerDouble("Speed", "Speed", 35, 1, 100);
+    private final Setting.Double speed = registerDouble("Speed", "Speed", 50, 1, 250);
     private final Setting.Mode mode = registerMode("Mode", "Mode", Arrays.asList(
             "Control",
-            "Highway"
+            "Highway",
+            "Superman"
     ), "Control");
     private final Setting.Boolean takeoffTimer = registerBoolean("Takeoff Timer", "TakeoffTimer", true);
     private final Setting.Boolean autoTakeoff = registerBoolean("Auto Takeoff", "AutoTakeoff", true);
+    private final Setting.Mode yawMode = registerMode("Yaw", "Yaw", Arrays.asList(
+            "East",
+            "North",
+            "West",
+            "South",
+            "PlayerYaw"
+    ), "PlayerYaw");
 
     private boolean wasAllowedFlying = false;
     private boolean wasFlying = false;
@@ -27,10 +35,10 @@ public class ElytraFlight extends Module {
 
     public ElytraFlight() {
         super("ElytraFlight", Category.Movement);
-        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Override public void onEnable() {
+        MinecraftForge.EVENT_BUS.register(this);
         if (mc.getConnection() == null  ||
             mc.world == null            ||
             mc.player == null) return;
@@ -40,6 +48,7 @@ public class ElytraFlight extends Module {
         mc.player.capabilities.isFlying = true;
     }
     @Override public void onDisable() {
+        MinecraftForge.EVENT_BUS.unregister(this);
         if (mc.getConnection() == null  ||
             mc.world == null            ||
             mc.player == null) return;
@@ -57,26 +66,57 @@ public class ElytraFlight extends Module {
         mc.player.speedInAir = (float) speed.getValue();
         CPacketPlayer packet = new CPacketPlayer(false);
         packet.pitch = wantedPitch;
+        packet.yaw = getWantedYaw();
+        packet.moving = true;
+        packet.x = speed.getValue();
+        packet.z = speed.getValue();
         mc.getConnection().sendPacket(packet);
     }
 
     @SubscribeEvent
     public void onKeyInput(InputEvent.KeyInputEvent event) {
         if (Keyboard.getEventKeyState()) {
-            if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
-                setWantedPitch();
-            }
+            setWantedPitch(Keyboard.getEventKey() == Keyboard.KEY_SPACE);
         }
     }
 
-    private void setWantedPitch() {
-        switch (mode.getValue()){
+    private void setWantedPitch(boolean isSpacePressed) {
+        if (isSpacePressed) {
+            switch (mode.getValue()) {
+                case "Control":
+                    wantedPitch = 180f;
+                    break;
+                case "Highway":
+                    wantedPitch = 145f;
+                    break;
+                case "Superman":
+                    wantedPitch = mc.player.cameraPitch + 40f;
+                    break;
+            }
+        } else switch (mode.getValue()) {
             case "Control":
-                wantedPitch = 180f;
+                wantedPitch = 90f;
                 break;
             case "Highway":
-                wantedPitch = 145f;
+                wantedPitch = 80f;
                 break;
+            case "Superman":
+                wantedPitch = mc.player.cameraPitch;
+                break;
+        }
+    }
+    private float getWantedYaw() {
+        switch (yawMode.getValue()) {
+            case "East":
+                return 0;
+            case "North":
+                return 0;
+            case "West":
+                return 0;
+            case "South":
+                return 0;
+            default:
+                return mc.player.cameraYaw;
         }
     }
 }

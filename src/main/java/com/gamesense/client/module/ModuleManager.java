@@ -27,6 +27,7 @@ public class ModuleManager {
         //Combat
         addMod(new AutoArmor());
         addMod(new AutoCrystal());
+        addMod(new AutoCrystalRewrite());
         addMod(new Surround());
         addMod(new AutoTotem());
         addMod(new AutoTrap());
@@ -50,6 +51,7 @@ public class ModuleManager {
         addMod(new NoSwing());
         addMod(new PortalGodMode());
         //Movement
+        addMod(new ElytraFlight());
         addMod(new FastFall());
         addMod(new PlayerTweaks());
         addMod(new ReverseStep());
@@ -64,7 +66,7 @@ public class ModuleManager {
         addMod(new AutoTool());
         addMod(new ChatModifier());
         addMod(new ChatSuffix());
-        //addMod(new DiscordRPCModule()); TODO fix DiscordRPCModule.java and uncomment this
+        addMod(new DiscordRPCModule());
         addMod(new FastPlace());
         addMod(new SkiddaOnBottomDupe());
         addMod(new FakePlayer());

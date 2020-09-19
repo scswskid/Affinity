@@ -26,18 +26,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LogoutSpots extends Module {
     Map<Entity, String> loggedPlayers = new ConcurrentHashMap<>();
     @EventHandler
-    private final Listener<PlayerJoinEvent> listener1 = new Listener<>(event -> {
-        loggedPlayers.forEach((e, s) -> {
-            try {
-                if (e.getName().equalsIgnoreCase(event.getName())) {
-                    loggedPlayers.remove(e);
-                    Command.sendClientMessage(event.getName() + " reconnected!");
-                }
-            } catch (ConcurrentModificationException ex) {
-                ex.printStackTrace();
+    private final Listener<PlayerJoinEvent> listener1 = new Listener<>(event -> loggedPlayers.forEach((e, s) -> {
+        try {
+            if (e.getName().equalsIgnoreCase(event.getName())) {
+                loggedPlayers.remove(e);
+                Command.sendClientMessage(event.getName() + " reconnected!");
             }
-        });
-    });
+        } catch (ConcurrentModificationException ignored) {}
+    }));
     List<Entity> lastTickEntities;
     @EventHandler
     private final Listener<PlayerLeaveEvent> listener2 = new Listener<>(event -> {

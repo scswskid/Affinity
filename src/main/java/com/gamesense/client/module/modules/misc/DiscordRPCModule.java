@@ -15,6 +15,8 @@ public class DiscordRPCModule extends Module {
     private boolean connected = false;
     private final DiscordRPC rpc = DiscordRPC.INSTANCE;
     private final DiscordRichPresence presence = new DiscordRichPresence();
+    private String player = "No player Detected.";
+    private boolean playerDetected = false;
 
     public DiscordRPCModule() {
         super("DiscordRPC", Category.Misc);
@@ -27,8 +29,11 @@ public class DiscordRPCModule extends Module {
 
         rpc.Discord_Initialize(AffinityPlus.DISCORDAPPID, new DiscordEventHandlers(), true, null);
         presence.startTimestamp = System.currentTimeMillis() / 1000L;
+        presence.details = "Vibing on " + mc.getConnection() != null ? mc.currentServerData.serverIP : "the Main Menu";
+        presence.state = player + " | Affinity+ On Top!";
+        rpc.Discord_UpdatePresence(presence);
 
-        new Thread(this::rpcUpdate, "DiscordRPCHandler");
+        new Thread(() -> rpcUpdate(), "DiscordRPCHandler");
     }
 
     @Override
@@ -37,12 +42,11 @@ public class DiscordRPCModule extends Module {
     }
 
     private void rpcUpdate() {
-        while (!Thread.currentThread().isInterrupted() && connected) {
+        while (connected) {
             try {
+                if (!playerDetected) player = mc.player.getName();
                 presence.details = "Vibing on " + mc.getConnection() != null ? mc.currentServerData.serverIP : "the Main Menu";
-                String presenceMessage = mc.player != null ? String.valueOf(mc.player.getHealth() + mc.player.getAbsorptionAmount()) : "No ";
-                presenceMessage += "HP | Affinity+ On Top!";
-                presence.state = presenceMessage;
+                presence.state = player + " | Affinity+ On Top!";
                 rpc.Discord_UpdatePresence(presence);
 
                 Thread.sleep(updateDelay.getValue() * 1000L);

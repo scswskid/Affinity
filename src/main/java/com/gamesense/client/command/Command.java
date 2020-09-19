@@ -20,7 +20,7 @@ public abstract class Command {
             return;
         } else {
             if (MsgWaterMark)
-                mc.player.sendMessage(new TextComponentString(ChatFormatting.GRAY + "[" + ChatFormatting.WHITE + "Game" + ChatFormatting.DARK_GREEN + "Sense" + ChatFormatting.GRAY + "] " + ChatFormatting.RESET + cf + message));
+                mc.player.sendMessage(new TextComponentString(ChatFormatting.AQUA + "[" + ChatFormatting.WHITE + "Affinity" + ChatFormatting.RED + "+" + ChatFormatting.AQUA + "] " + ChatFormatting.RESET + cf + message));
             else
                 mc.player.sendMessage(new TextComponentString(cf + message));
         }
