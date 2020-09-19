@@ -89,6 +89,7 @@ public class AutoCrystalRewrite extends Module {
     private static boolean isAttacking = false;
     private static boolean isPlacing = false;
     private static boolean isBreaking = false;
+    private static boolean offhand = false;
 
     //All doubles
     private static double yaw;
@@ -98,12 +99,16 @@ public class AutoCrystalRewrite extends Module {
     private static int oldSlot = -1;
     private static int newSlot;
     private static int waitCounter;
+    private static int crystalSlot;
+
+    //All longs
     private static long breakSystemTime;
 
     //All diffs
     private static final ArrayList<BlockPos> placedCrystals = new ArrayList<>();
-    private static EnumFacing f;
+    private static EnumFacing facing;
     private static BlockPos render;
+    private static BlockPos queuedBlock = null;
     private static Entity renderEnt;
 
     public AutoCrystalRewrite() {
@@ -194,7 +199,7 @@ public class AutoCrystalRewrite extends Module {
         isPlacing = false;
         isBreaking = false;
         if (chat.getValue() && mc.player != null) {
-            Command.sendRawMessage("\u00A7aAutoCrystal turned ON!");
+            Command.sendClientMessage("\u00A7aAutoCrystal turned ON!");
         }
     }
     @Override public void onDisable() {
@@ -207,7 +212,7 @@ public class AutoCrystalRewrite extends Module {
         isPlacing = false;
         isBreaking = false;
         if (chat.getValue()) {
-            Command.sendRawMessage("\u00A7cAutoCrystal turned OFF!");
+            Command.sendClientMessage("\u00A7cAutoCrystal turned OFF!");
         }
     }
     @Override public void onUpdate() {
@@ -215,9 +220,7 @@ public class AutoCrystalRewrite extends Module {
         isBreaking = false;
         isPlacing = false;
         if (mc.player == null || mc.player.isDead) return;
-
-        int crystalSlot = getCrystalItemSlot();
-        boolean offhand = false;
+        crystalSlot = getCrystalItemSlot();
         if (mc.player.getHeldItemOffhand().getItem() == Items.END_CRYSTAL) {
             offhand = true;
         } else if (crystalSlot == -1) {
@@ -228,7 +231,6 @@ public class AutoCrystalRewrite extends Module {
         List<Entity> entities = new ArrayList<>();
         entities.addAll(mc.world.playerEntities.stream().filter(entityPlayer -> !Friends.isFriend(entityPlayer.getName())).sorted(Comparator.comparing(e -> mc.player.getDistance(e))).collect(Collectors.toList()));
 
-        BlockPos q = null;
         double damage = 0.5D;
         Iterator var9 = entities.iterator();
 
@@ -245,80 +247,8 @@ public class AutoCrystalRewrite extends Module {
                             return;
                         }
 
-                        render = q;
-                        if (place.getValue()) {
-                            if (antiSuicide.getValue() &&
-                                    mc.player.getHealth() +
-                                            mc.player.getAbsorptionAmount() <
-                                            antiSuicideValue.getValue()) {
-                                    return;
-                            }
-                            if (!offhand && mc.player.inventory.currentItem != crystalSlot) {
-                                if (autoSwitch.getValue()) {
-                                    mc.player.inventory.currentItem = crystalSlot;
-                                    resetRotation();
-                                    switchCooldown = true;
-                                }
-                                return;
-                            }
-
-                            if (rotate.getValue())
-                                lookAtPacket((double) q.getX() + 0.5D, (double) q.getY() - 0.5D, (double) q.getZ() + 0.5D, mc.player);
-
-                            RayTraceResult result = mc.world.rayTraceBlocks(new Vec3d(mc.player.posX, mc.player.posY + (double) mc.player.getEyeHeight(), mc.player.posZ), new Vec3d((double) q.getX() + 0.5D, (double) q.getY() - 0.5D, (double) q.getZ() + 0.5D));
-                            if (raytrace.getValue()) {
-                                if (result == null || result.sideHit == null) {
-                                    q = null;
-                                    f = null;
-                                    render = null;
-                                    resetRotation();
-                                    isActive = false;
-                                    isPlacing = false;
-                                    return;
-                                } else {
-                                    f = result.sideHit;
-                                }
-                            }
-
-                            if (switchCooldown) {
-                                switchCooldown = false;
-                                return;
-                            }
-
-                            //mc.playerController.processRightClickBlock(mc.player, mc.world, q, f, new Vec3d(0, 0, 0), EnumHand.MAIN_HAND);
-                            if (q != null && mc.player != null) {
-                                isActive = true;
-                                isPlacing = true;
-                                if (raytrace.getValue() && f != null) {
-                                    mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(q, f, offhand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, 0, 0, 0));
-                                } else if (q.getY() == 255) {
-                                    // For Hoosiers. This is how we do buildheight. If the target block (q) is at Y 255. Then we send a placement packet to the bottom part of the block. Thus the EnumFacing.DOWN.
-                                    mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(q, EnumFacing.DOWN, offhand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, 0, 0, 0));
-                                } else {
-                                    mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(q, EnumFacing.UP, offhand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, 0, 0, 0));
-                                }
-                                mc.player.connection.sendPacket(new CPacketAnimation(EnumHand.MAIN_HAND));
-                                //Cache the crystals we've placed
-                                placedCrystals.add(q);
-                                if (ModuleManager.isModuleEnabled("AutoGG"))
-                                    AutoGG.INSTANCE.addTargetedPlayer(renderEnt.getName());
-                            }
-
-                            if (isSpoofingAngles) {
-                                EntityPlayerSP var10000;
-                                if (togglePitch) {
-                                    var10000 = mc.player;
-                                    var10000.rotationPitch = (float) ((double) var10000.rotationPitch + 4.0E-4D);
-                                    togglePitch = false;
-                                } else {
-                                    var10000 = mc.player;
-                                    var10000.rotationPitch = (float) ((double) var10000.rotationPitch - 4.0E-4D);
-                                    togglePitch = true;
-                                }
-                            }
-
-                            return;
-                        }
+                        render = queuedBlock;
+                        calcAndPlaceCrystal();
                     }
 
                     entity = (EntityPlayer) var9.next();
@@ -340,16 +270,9 @@ public class AutoCrystalRewrite extends Module {
                     do {
                         do {
                             do {
-                                double b;
                                 do {
                                     if (!var11.hasNext()) {
-                                        EntityEnderCrystal crystal = mc.world.loadedEntityList.stream()
-                                                .filter(myCrystal -> myCrystal instanceof EntityEnderCrystal)
-                                                .filter(e -> mc.player.getDistance(e) <= range.getValue())
-                                                .filter(this::crystalCheck)
-                                                .map(myCrystal -> (EntityEnderCrystal) myCrystal)
-                                                .min(Comparator.comparing(c -> mc.player.getDistance(c)))
-                                                .orElse(null);
+                                        EntityEnderCrystal crystal = getTargetCrystal();
                                         if (explode.getValue() && crystal != null) explodeCrystal(crystal);
                                         else {
                                             resetRotation();
@@ -365,13 +288,9 @@ public class AutoCrystalRewrite extends Module {
                                     }
 
                                     blockPos = (BlockPos) var11.next();
-                                    b = entity.getDistanceSq(blockPos);
-                                    // Better method for doing EnemyRange
-                                    // @Author Cyber
                                     x = blockPos.getX() + 0.0;
                                     y = blockPos.getY() + 1.0;
                                     z = blockPos.getZ() + 0.0;
-                                    // } while (b >= 169.0D);
                                 } while (entity.getDistanceSq(x, y, z) >= enemyRange.getValue() * enemyRange.getValue());
 
                                 d = calculateDamage((double) blockPos.getX() + 0.5D, blockPos.getY() + 1, (double) blockPos.getZ() + 0.5D, entity);
@@ -384,7 +303,7 @@ public class AutoCrystalRewrite extends Module {
                 } while (self >= mc.player.getHealth() + mc.player.getAbsorptionAmount());
 
                 damage = d;
-                q = blockPos;
+                queuedBlock = blockPos;
                 renderEnt = entity;
             }
         }
@@ -415,7 +334,7 @@ public class AutoCrystalRewrite extends Module {
     }
 
     //Extra Methods used to calculate stuff
-    private boolean crystalCheck(Entity crystal) {
+    private static boolean crystalCheck(Entity crystal) {
         if (!(crystal instanceof EntityEnderCrystal))
             return false;
 
@@ -462,7 +381,7 @@ public class AutoCrystalRewrite extends Module {
 
         return false;
     }
-    public static boolean canPlaceCrystal(BlockPos blockPos) {
+    private static boolean canPlaceCrystal(BlockPos blockPos) {
         BlockPos boost = blockPos.add(0, 1, 0);
         BlockPos boost2 = blockPos.add(0, 2, 0);
         if (!endCrystalMode.getValue())
@@ -562,12 +481,31 @@ public class AutoCrystalRewrite extends Module {
                 .min(Comparator.comparing(distanceTarget::getDistance))
                 .orElse(null);
     }
+    private static EntityEnderCrystal getTargetCrystal() {
+        return breakMode.getValue().equals("All") ?
+               mc.world.loadedEntityList.stream()
+                       .filter(myCrystal -> myCrystal instanceof EntityEnderCrystal)
+                       .filter(e -> mc.player.getDistance(e) <= range.getValue())
+                       .filter(placedCrystals::contains)
+                       .map(myCrystal -> (EntityEnderCrystal) myCrystal)
+                       .min(Comparator.comparing(c -> mc.player.getDistance(c)))
+                       .orElse(null) //IF breakMode = "All"
+               :
+               mc.world.loadedEntityList.stream()
+                       .filter(myCrystal -> myCrystal instanceof EntityEnderCrystal)
+                       .filter(e -> mc.player.getDistance(e) <= range.getValue())
+                       .filter(AutoCrystalRewrite::crystalCheck)
+                       .filter(placedCrystals::contains)
+                       .map(myCrystal -> (EntityEnderCrystal) myCrystal)
+                       .min(Comparator.comparing(c -> mc.player.getDistance(c)))
+                       .orElse(null); //IF breakMode != "All"
+    }
     private static List<BlockPos> findCrystalBlocks() {
         NonNullList<BlockPos> positions = NonNullList.create();
         positions.addAll(getSphere(getPlayerPos(), (float) placeRange.getValue(), (int) placeRange.getValue(), false, true, 0).stream().filter(AutoCrystalRewrite::canPlaceCrystal).collect(Collectors.toList()));
         return positions;
     }
-    public static List<BlockPos> getSphere(BlockPos loc, float r, int h, boolean hollow, boolean sphere, int plus_y) {
+    private static List<BlockPos> getSphere(BlockPos loc, float r, int h, boolean hollow, boolean sphere, int plus_y) {
         List<BlockPos> circleblocks = new ArrayList<>();
         int cx = loc.getX();
         int cy = loc.getY();
@@ -664,17 +602,13 @@ public class AutoCrystalRewrite extends Module {
             if (handBreak.getValue().equalsIgnoreCase("Offhand") && !mc.player.getHeldItemOffhand().isEmpty) {
                 mc.player.swingArm(EnumHand.OFF_HAND);
                 if (cancelCrystal.getValue()) {
-                    crystal.setDead();
-                    mc.world.removeAllEntities();
-                    mc.world.getLoadedEntityList();
+                    doCancelCrystal(crystal);
                 }
 
             } else {
                 mc.player.swingArm(EnumHand.MAIN_HAND);
                 if (cancelCrystal.getValue()) {
-                    crystal.setDead();
-                    mc.world.removeAllEntities();
-                    mc.world.getLoadedEntityList();
+                    doCancelCrystal(crystal);
                 }
 
             }
@@ -682,16 +616,12 @@ public class AutoCrystalRewrite extends Module {
                 mc.player.swingArm(EnumHand.MAIN_HAND);
                 mc.player.swingArm(EnumHand.OFF_HAND);
                 if (cancelCrystal.getValue()) {
-                    crystal.setDead();
-                    mc.world.removeAllEntities();
-                    mc.world.getLoadedEntityList();
+                    doCancelCrystal(crystal);
                 }
 
             }
             if (cancelCrystal.getValue()) {
-                crystal.setDead();
-                mc.world.removeAllEntities();
-                mc.world.getLoadedEntityList();
+                doCancelCrystal(crystal);
                 breakSystemTime = System.nanoTime() / 1000000L;
             }
 
@@ -700,6 +630,89 @@ public class AutoCrystalRewrite extends Module {
         }
         if (!singlePlace.getValue()) {
             return;
+        }
+    }
+    private static void calcAndPlaceCrystal() {
+        if (place.getValue()) {
+            if (antiSuicide.getValue() &&
+                    mc.player.getHealth() +
+                            mc.player.getAbsorptionAmount() <
+                            antiSuicideValue.getValue()) {
+                return;
+            }
+            if (!offhand && mc.player.inventory.currentItem != crystalSlot) {
+                if (autoSwitch.getValue()) {
+                    mc.player.inventory.currentItem = crystalSlot;
+                    resetRotation();
+                    switchCooldown = true;
+                }
+                return;
+            }
+
+            if (rotate.getValue())
+                lookAtPacket((double) queuedBlock.getX() + 0.5D, (double) queuedBlock.getY() - 0.5D, (double) queuedBlock.getZ() + 0.5D, mc.player);
+
+            RayTraceResult result = mc.world.rayTraceBlocks(new Vec3d(mc.player.posX, mc.player.posY + (double) mc.player.getEyeHeight(), mc.player.posZ), new Vec3d((double) queuedBlock.getX() + 0.5D, (double) queuedBlock.getY() - 0.5D, (double) queuedBlock.getZ() + 0.5D));
+            if (raytrace.getValue()) {
+                if (result == null || result.sideHit == null) {
+                    queuedBlock = null;
+                    facing = null;
+                    render = null;
+                    resetRotation();
+                    isActive = false;
+                    isPlacing = false;
+                    return;
+                } else {
+                    facing = result.sideHit;
+                }
+            }
+
+            if (switchCooldown) {
+                switchCooldown = false;
+                return;
+            }
+
+            //mc.playerController.processRightClickBlock(mc.player, mc.world, q, f, new Vec3d(0, 0, 0), EnumHand.MAIN_HAND);
+            if (queuedBlock != null && mc.player != null) {
+                isActive = true;
+                isPlacing = true;
+                if (raytrace.getValue() && facing != null) {
+                    mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(queuedBlock, facing, offhand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, 0, 0, 0));
+                } else if (queuedBlock.getY() == 255) {
+                    // For Hoosiers. This is how we do buildheight. If the target block (q) is at Y 255. Then we send a placement packet to the bottom part of the block. Thus the EnumFacing.DOWN.
+                    mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(queuedBlock, EnumFacing.DOWN, offhand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, 0, 0, 0));
+                } else {
+                    mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(queuedBlock, EnumFacing.UP, offhand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, 0, 0, 0));
+                }
+                mc.player.connection.sendPacket(new CPacketAnimation(EnumHand.MAIN_HAND));
+                //Cache the crystals we've placed
+                placedCrystals.add(queuedBlock);
+                addToAutoGG(renderEnt.getName());
+            }
+
+            trySpoofAngles();
+        }
+    }
+    private static void doCancelCrystal(EntityEnderCrystal crystal) {
+        crystal.setDead();
+        mc.world.removeAllEntities();
+        mc.world.getLoadedEntityList();}
+    private static void addToAutoGG(String name) {
+        if (ModuleManager.isModuleEnabled("AutoGG"))
+            AutoGG.INSTANCE.addTargetedPlayer(name);
+    }
+    private static void trySpoofAngles() {
+        if (isSpoofingAngles) {
+            EntityPlayerSP var10000;
+            if (togglePitch) {
+                var10000 = mc.player;
+                var10000.rotationPitch = (float) ((double) var10000.rotationPitch + 4.0E-4D);
+                togglePitch = false;
+            } else {
+                var10000 = mc.player;
+                var10000.rotationPitch = (float) ((double) var10000.rotationPitch - 4.0E-4D);
+                togglePitch = true;
+            }
         }
     }
 }

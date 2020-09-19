@@ -37,6 +37,7 @@ public class ModuleManager {
         addMod(new KillAura());
         addMod(new Auto32K());
         addMod(new BruceAura());
+        addMod(new YakgodAura());
         addMod(new AutoOffhand());
         addMod(new SmartOffhand());
         addMod(new OffhandCrystal());

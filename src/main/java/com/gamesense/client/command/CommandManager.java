@@ -23,6 +23,7 @@ public class CommandManager {
         addCommand(new ModsCommand());
         addCommand(new OpenFolderCommand());
         addCommand(new PrefixCommand());
+        addCommand(new ResetGuiCommand());
         addCommand(new SaveConfigCommand());
         addCommand(new SetSettingCommand());
         addCommand(new ToggleCommand());

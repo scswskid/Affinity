@@ -20,6 +20,10 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
+import org.lwjgl.input.Keyboard;
 
 import static com.gamesense.api.util.world.BlockUtils.faceVectorPacketInstant;
 
@@ -27,7 +31,6 @@ public class Surround extends Module {
     Setting.Boolean chatMsg;
     Setting.Boolean triggerSurround;
     Setting.Boolean rotate;
-    Setting.Boolean disableNone;
     Setting.Boolean disableOnJump;
     Setting.Boolean centerPlayer;
     Setting.Integer tickDelay;
@@ -48,7 +51,6 @@ public class Surround extends Module {
 
     public void setup() {
         triggerSurround = registerBoolean("Triggerable", "Triggerable", false);
-        disableNone = registerBoolean("Disable No Obby", "DisableNoObby", true);
         disableOnJump = registerBoolean("Disable On Jump", "DisableOnJump", false);
         rotate = registerBoolean("Rotate", "Rotate", true);
         centerPlayer = registerBoolean("Center Player", "CenterPlayer", false);
@@ -59,13 +61,15 @@ public class Surround extends Module {
     }
 
     public void onEnable() {
+        MinecraftForge.EVENT_BUS.register(this);
+
         if (mc.player == null) {
             disable();
             return;
         }
 
         if (chatMsg.getValue()) {
-            Command.sendRawMessage("\u00A7aSurround turned ON!");
+            Command.sendClientMessage("\u00A7aSurround turned ON!");
         }
 
         if (centerPlayer.getValue() && mc.player.onGround) {
@@ -80,6 +84,8 @@ public class Surround extends Module {
     }
 
     public void onDisable() {
+        MinecraftForge.EVENT_BUS.unregister(this);
+
         if (mc.player == null) {
             return;
         }
@@ -88,7 +94,7 @@ public class Surround extends Module {
             if (noObby) {
                 return;
             } else {
-                Command.sendRawMessage("\u00A7cSurround turned OFF!");
+                Command.sendClientMessage("\u00A7cSurround turned OFF!");
             }
         }
 
@@ -115,15 +121,6 @@ public class Surround extends Module {
             return;
         }
 
-        if (disableNone.getValue() && noObby) {
-            if (chatMsg.getValue()) {
-                Command.sendRawMessage("\u00A7cNo obsidian detected... Surround turned OFF!");
-            }
-            mc.player.inventory.currentItem = cachedHotbarSlot;
-            disable();
-            return;
-        }
-
         if (mc.player.posY <= 0) {
             return;
         }
@@ -131,7 +128,7 @@ public class Surround extends Module {
         if (firstRun) {
             firstRun = false;
             if (findObsidianSlot() == -1) {
-                noObby = true;
+                return;
             }
         } else {
             if (delayTimeTicks < tickDelay.getValue()) {
@@ -142,7 +139,7 @@ public class Surround extends Module {
             }
         }
 
-        if (disableOnJump.getValue() && !(mc.player.onGround)) {
+        if (findObsidianSlot() == -1) {
             return;
         }
 
@@ -218,6 +215,13 @@ public class Surround extends Module {
             offsetSteps++;
         }
         runTimeTicks++;
+    }
+
+    @SubscribeEvent
+    public void onKeyboardPressed(InputEvent.KeyInputEvent event) {
+        if (Keyboard.getEventKey() != Keyboard.KEY_SPACE) return;
+
+        if (disableOnJump.getValue()) this.disable();
     }
 
     private int findObsidianSlot() {

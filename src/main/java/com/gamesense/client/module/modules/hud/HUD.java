@@ -238,7 +238,7 @@ public class HUD extends Module {
                 } else {
                     FontUtils.drawStringWithShadow(customFont.getValue(), "KA: DSBL", infox.getValue(), infoy.getValue() + 10, off);
                 }
-                if (ModuleManager.isModuleEnabled("AutoFeetPlace")) {
+                if (ModuleManager.isModuleEnabled("Surround")) {
                     FontUtils.drawStringWithShadow(customFont.getValue(), "FP: ENBL", infox.getValue(), infoy.getValue() + 20, on);
                 } else {
                     FontUtils.drawStringWithShadow(customFont.getValue(), "FP: DSBL", infox.getValue(), infoy.getValue() + 20, off);
