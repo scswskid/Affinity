@@ -1,7 +1,7 @@
 package com.gamesense.client.clickgui.buttons;
 
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.font.FontUtils;
 import com.gamesense.client.clickgui.frame.Buttons;
 import com.gamesense.client.clickgui.frame.Component;
@@ -102,26 +102,26 @@ public class ColorComponent extends Component {
             hoveredB = false;
         }
         if (this.dragging) {
-            GSColor c = set.getColor();
+            APColor c = set.getColor();
             if (ColorMain.colorModel.getValue().equalsIgnoreCase("RGB")) {
                 int newValue;
                 if (diff == 0.0) newValue = 0;
                 else newValue = (int) roundToPlace(diff / 100.0 * 255, 2);
                 if (mouseY - this.y >= 32 && mouseY - this.y < 48) {
-                    set.setValue(set.getRainbow(), new GSColor(newValue, c.getGreen(), c.getBlue()));
+                    set.setValue(set.getRainbow(), new APColor(newValue, c.getGreen(), c.getBlue()));
                 } else if (mouseY - this.y >= 48 && mouseY - this.y < 64) {
-                    set.setValue(set.getRainbow(), new GSColor(c.getRed(), newValue, c.getBlue()));
+                    set.setValue(set.getRainbow(), new APColor(c.getRed(), newValue, c.getBlue()));
                 } else if (mouseY - this.y >= 64 && mouseY - this.y < 80) {
-                    set.setValue(set.getRainbow(), new GSColor(c.getRed(), c.getGreen(), newValue));
+                    set.setValue(set.getRainbow(), new APColor(c.getRed(), c.getGreen(), newValue));
                 }
             } else {
                 float newValue = (float) (diff / 100.0);
                 if (mouseY - this.y >= 32 && mouseY - this.y < 48) {
-                    set.setValue(set.getRainbow(), GSColor.fromHSB(newValue, c.getSaturation(), c.getBrightness()));
+                    set.setValue(set.getRainbow(), APColor.fromHSB(newValue, c.getSaturation(), c.getBrightness()));
                 } else if (mouseY - this.y >= 48 && mouseY - this.y < 64) {
-                    set.setValue(set.getRainbow(), GSColor.fromHSB(c.getHue(), newValue, c.getBrightness()));
+                    set.setValue(set.getRainbow(), APColor.fromHSB(c.getHue(), newValue, c.getBrightness()));
                 } else if (mouseY - this.y >= 64 && mouseY - this.y < 80) {
-                    set.setValue(set.getRainbow(), GSColor.fromHSB(c.getHue(), c.getSaturation(), newValue));
+                    set.setValue(set.getRainbow(), APColor.fromHSB(c.getHue(), c.getSaturation(), newValue));
                 }
             }
         }

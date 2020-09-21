@@ -138,9 +138,9 @@ public class Auto32K extends Module {
             }
             Auto32K.mc.player.inventory.currentItem = this.hopperSlot;
             this.placeBlock(new BlockPos(this.placeTarget.offset(Auto32K.mc.player.getHorizontalFacing().getOpposite())), Auto32K.mc.player.getHorizontalFacing());
-            Auto32K.mc.player.connection.sendPacket((Packet) new CPacketEntityAction((Entity) Auto32K.mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
+            Auto32K.mc.player.connection.sendPacket(new CPacketEntityAction(Auto32K.mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
             this.isSneaking = false;
-            Auto32K.mc.player.connection.sendPacket((Packet) new CPacketPlayerTryUseItemOnBlock(this.placeTarget.offset(Auto32K.mc.player.getHorizontalFacing().getOpposite()), EnumFacing.DOWN, EnumHand.MAIN_HAND, 0.0f, 0.0f, 0.0f));
+            Auto32K.mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(this.placeTarget.offset(Auto32K.mc.player.getHorizontalFacing().getOpposite()), EnumFacing.DOWN, EnumHand.MAIN_HAND, 0.0f, 0.0f, 0.0f));
             Auto32K.mc.player.inventory.currentItem = this.shulkerSlot;
             if (!this.grabItem.getValue()) {
                 this.disable();
@@ -156,9 +156,10 @@ public class Auto32K extends Module {
         if (((GuiContainer) Auto32K.mc.currentScreen).inventorySlots.getSlot(0).getStack().isEmpty) {
             return;
         }
-        Auto32K.mc.playerController.windowClick(Auto32K.mc.player.openContainer.windowId, 0, Auto32K.mc.player.inventory.currentItem, ClickType.SWAP, (EntityPlayer) Auto32K.mc.player);
+        Auto32K.mc.playerController.windowClick(Auto32K.mc.player.openContainer.windowId, 0, Auto32K.mc.player.inventory.currentItem, ClickType.QUICK_MOVE, Auto32K.mc.player);
         if (this.autoEnableHitAura.getValue()) {
-            AffinityPlus.getInstance().moduleManager.getModuleByName("KillAura").enable();
+            AffinityPlus.getInstance().moduleManager.getModuleByName("BruceAura").enable();
+            AffinityPlus.getInstance().moduleManager.getModuleByName("YakgodAura").enable();
         }
         this.disable();
     }
@@ -167,7 +168,7 @@ public class Auto32K extends Module {
         BlockPos neighbour = pos.offset(side);
         EnumFacing opposite = side.getOpposite();
         if (!this.isSneaking) {
-            Auto32K.mc.player.connection.sendPacket((Packet) new CPacketEntityAction(Auto32K.mc.player, CPacketEntityAction.Action.START_SNEAKING));
+            Auto32K.mc.player.connection.sendPacket(new CPacketEntityAction(Auto32K.mc.player, CPacketEntityAction.Action.START_SNEAKING));
             this.isSneaking = true;
         }
         Vec3d hitVec = new Vec3d(neighbour).add(0.5, 0.5, 0.5).add(new Vec3d(opposite.getDirectionVec()).scale(0.5));

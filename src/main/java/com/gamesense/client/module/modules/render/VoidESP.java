@@ -2,7 +2,7 @@ package com.gamesense.client.module.modules.render;
 
 import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.render.GameSenseTessellator;
 import com.gamesense.api.util.world.BlockUtils;
 import com.gamesense.api.util.world.GeometryMasks;
@@ -52,7 +52,7 @@ public class VoidESP extends Module {
         renderType = registerMode("Render", "Render", render, "Both");
         renderMode = registerMode("Mode", "Mode", modes, "Flat");
         width = registerInteger("Width", "Width", 1, 1, 10);
-        color = registerColor("Color", "Color", new GSColor(255, 255, 0));
+        color = registerColor("Color", "Color", new APColor(255, 255, 0));
     }
 
     @Override
@@ -118,7 +118,7 @@ public class VoidESP extends Module {
 
     private void drawFlat(BlockPos blockPos) {
         if (renderType.getValue().equalsIgnoreCase("Fill") || renderType.getValue().equalsIgnoreCase("Both")) {
-            GSColor c = new GSColor(color.getValue(), 50);
+            APColor c = new APColor(color.getValue(), 50);
             AxisAlignedBB bb = mc.world.getBlockState(blockPos).getSelectedBoundingBox(mc.world, blockPos);
             if (renderMode.getValue().equalsIgnoreCase("Flat")) {
                 GameSenseTessellator.drawBox(blockPos, c, GeometryMasks.Quad.DOWN);
@@ -128,7 +128,7 @@ public class VoidESP extends Module {
 
     private void drawBox(BlockPos blockPos) {
         if (renderType.getValue().equalsIgnoreCase("Fill") || renderType.getValue().equalsIgnoreCase("Both")) {
-            GSColor c = new GSColor(color.getValue(), 50);
+            APColor c = new APColor(color.getValue(), 50);
             AxisAlignedBB bb = mc.world.getBlockState(blockPos).getSelectedBoundingBox(mc.world, blockPos);
             GameSenseTessellator.drawBox(blockPos, c, GeometryMasks.Quad.ALL);
         }

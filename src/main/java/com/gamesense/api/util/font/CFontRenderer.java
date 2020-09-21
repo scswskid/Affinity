@@ -1,6 +1,6 @@
 package com.gamesense.api.util.font;
 
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import org.lwjgl.opengl.GL11;
@@ -44,33 +44,33 @@ public class CFontRenderer extends CFont {
         fontSize = newSize;
     }
 
-    public float drawStringWithShadow(String text, double x, double y, GSColor color) {
+    public float drawStringWithShadow(String text, double x, double y, APColor color) {
         float shadowWidth = drawString(text, x + 1D, y + 1D, color, true);
         return Math.max(shadowWidth, drawString(text, x, y, color, false));
     }
 
-    public float drawString(String text, float x, float y, GSColor color) {
+    public float drawString(String text, float x, float y, APColor color) {
         return drawString(text, x, y, color, false);
     }
 
-    public float drawCenteredStringWithShadow(String text, float x, float y, GSColor color) {
+    public float drawCenteredStringWithShadow(String text, float x, float y, APColor color) {
         return drawStringWithShadow(text, x - getStringWidth(text) / 2, y, color);
     }
 
-    public float drawCenteredString(String text, float x, float y, GSColor color) {
+    public float drawCenteredString(String text, float x, float y, APColor color) {
         return drawString(text, x - getStringWidth(text) / 2, y, color);
     }
 
-    public float drawString(String text, double x, double y, GSColor gsColor, boolean shadow) {
+    public float drawString(String text, double x, double y, APColor APColor, boolean shadow) {
         x -= 1;
         y -= 2;
-        GSColor color = new GSColor(gsColor);
+        APColor color = new APColor(APColor);
         if (text == null) return 0.0F;
         if (color.getRed() == 255 && color.getGreen() == 255 && color.getBlue() == 255 && color.getAlpha() == 32)
-            color = new GSColor(255, 255, 255);
-        if (color.getAlpha() < 4) color = new GSColor(color, 255);
+            color = new APColor(255, 255, 255);
+        if (color.getAlpha() < 4) color = new APColor(color, 255);
         if (shadow)
-            color = new GSColor(color.getRed() / 4, color.getGreen() / 4, color.getBlue() / 4, color.getAlpha());
+            color = new APColor(color.getRed() / 4, color.getGreen() / 4, color.getBlue() / 4, color.getAlpha());
 
         CharData[] currentData = this.charData;
         boolean randomCase = false;

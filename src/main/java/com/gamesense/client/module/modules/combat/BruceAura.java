@@ -22,7 +22,7 @@ public class BruceAura extends Module {
     private Setting.Boolean attackPlayers = registerBoolean("Players", "Players", true);
     private Setting.Boolean attackMobs = registerBoolean("Mobs", "Mobs", false);
     private Setting.Boolean attackAnimals = registerBoolean("Animals", "Animals", false);
-    private Setting.Double hitRange = registerDouble("Hit Range", "HitRange", 5.5d, 0.0d, 6.0d);
+    private Setting.Double hitRange = registerDouble("Hit Range", "HitRange", 5.5d, 0.0d, 25.0d);
     private Setting.Boolean ignoreWalls = registerBoolean("Ignore Walls", "IgnoreWalls", true);
     private Setting.Double waitTick = registerDouble("Tick Delay", "TickDelay", 2.0d, 0.0d, 20.0d);
     private Setting.Mode switchMode = registerMode("Auto Switch", "Autoswitch", Arrays.asList(
@@ -187,13 +187,5 @@ public class BruceAura extends Module {
 
     private boolean canEntityFeetBeSeen(Entity entityIn) {
         return mc.world.rayTraceBlocks(new Vec3d(mc.player.posX, mc.player.posY + mc.player.getEyeHeight(), mc.player.posZ), new Vec3d(entityIn.posX, entityIn.posY, entityIn.posZ), false, true, false) == null;
-    }
-
-    private enum SwitchMode {
-        NONE, ALL, Only32k
-    }
-
-    private enum HitMode {
-        SWORD, AXE, Only32k
     }
 }

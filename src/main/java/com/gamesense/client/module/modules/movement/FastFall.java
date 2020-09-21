@@ -11,9 +11,6 @@ import net.minecraft.network.play.client.CPacketPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-//import net.minecraft.network.Packet;
-//import net.minecraft.world.IBlockAccess;
-
 public class FastFall extends Module {
     private final double[] oneblockPositions = new double[]{0.42, 0.75};
     private int packets;

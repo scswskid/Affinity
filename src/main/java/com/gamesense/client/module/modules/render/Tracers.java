@@ -4,7 +4,7 @@ import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.players.enemy.Enemies;
 import com.gamesense.api.players.friends.Friends;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.client.module.Module;
 import com.gamesense.client.module.modules.hud.ColorMain;
 import net.minecraft.client.Minecraft;
@@ -26,7 +26,7 @@ public class Tracers extends Module {
     Setting.ColorSetting nearColor;
     Setting.ColorSetting midColor;
     Setting.ColorSetting farColor;
-    GSColor tracerColor;
+    APColor tracerColor;
 
     public Tracers() {
         super("Tracers", Category.Render);
@@ -43,7 +43,7 @@ public class Tracers extends Module {
         return then + (now - then) * mc.getRenderPartialTicks();
     }
 
-    public static void renderLine(double posx, double posy, double posz, double posx2, double posy2, double posz2, double up, GSColor color) {
+    public static void renderLine(double posx, double posy, double posz, double posx2, double posy2, double posz2, double up, APColor color) {
         GL11.glPushMatrix();
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_BLEND);
@@ -70,7 +70,7 @@ public class Tracers extends Module {
         GL11.glPopMatrix();
     }
 
-    public static void renderLine(double posx, double posy, double posz, double posx2, double posy2, double posz2, GSColor color) {
+    public static void renderLine(double posx, double posy, double posz, double posx2, double posy2, double posz2, APColor color) {
         renderLine(posx, posy, posz, posx2, posy2, posz2, 0, color);
     }
 
@@ -82,9 +82,9 @@ public class Tracers extends Module {
         link.add("Feet");
 
         pointsTo = registerMode("Draw To", "DrawTo", link, "Feet");
-        nearColor = registerColor("Near Color", "NearColor", new GSColor(255, 0, 0));
-        midColor = registerColor("Middle Color", "MidColor", new GSColor(255, 255, 0));
-        farColor = registerColor("Far Color", "FarColor", new GSColor(0, 255, 0));
+        nearColor = registerColor("Near Color", "NearColor", new APColor(255, 0, 0));
+        midColor = registerColor("Middle Color", "MidColor", new APColor(255, 255, 0));
+        farColor = registerColor("Far Color", "FarColor", new APColor(0, 255, 0));
     }
 
     public void onWorldRender(RenderEvent event) {
@@ -119,12 +119,12 @@ public class Tracers extends Module {
                 });
     }
 
-    public void drawLineToEntityPlayer(Entity e, GSColor color) {
+    public void drawLineToEntityPlayer(Entity e, APColor color) {
         double[] xyz = interpolate(e);
         drawLine1(xyz[0], xyz[1], xyz[2], e.height, color);
     }
 
-    public void drawLine1(double posx, double posy, double posz, double up, GSColor color) {
+    public void drawLine1(double posx, double posy, double posz, double up, APColor color) {
         Vec3d eyes = new Vec3d(0, 0, 1)
                 .rotatePitch(-(float) Math
                         .toRadians(Minecraft.getMinecraft().player.rotationPitch))

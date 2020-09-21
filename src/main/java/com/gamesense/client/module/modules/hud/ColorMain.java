@@ -1,7 +1,7 @@
 package com.gamesense.client.module.modules.hud;
 
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.client.module.Module;
 import net.minecraft.util.text.TextFormatting;
 
@@ -129,12 +129,12 @@ public class ColorMain extends Module {
         return Color.WHITE;
     }
 
-    public static GSColor getFriendGSColor() {
-        return new GSColor(settingToColor(friendcolor));
+    public static APColor getFriendGSColor() {
+        return new APColor(settingToColor(friendcolor));
     }
 
-    public static GSColor getEnemyGSColor() {
-        return new GSColor(settingToColor(enemycolor));
+    public static APColor getEnemyGSColor() {
+        return new APColor(settingToColor(enemycolor));
     }
 
     public void setup() {

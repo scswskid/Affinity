@@ -4,7 +4,7 @@ import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.players.enemy.Enemies;
 import com.gamesense.api.players.friends.Friends;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.Wrapper;
 import com.gamesense.api.util.font.FontUtils;
 import com.gamesense.client.module.Module;
@@ -90,7 +90,7 @@ public class Nametags extends Module {
         GL11.glLineWidth(n);
     }
 
-    public static void drawBorderedRectReliant(final float x, final float y, final float x1, final float y1, final float lineWidth, final GSColor inside, final GSColor border) {
+    public static void drawBorderedRectReliant(final float x, final float y, final float x1, final float y1, final float lineWidth, final APColor inside, final APColor border) {
         enableGL2D();
         drawRect(x, y, x1, y1, inside);
         border.glColor();
@@ -130,11 +130,11 @@ public class Nametags extends Module {
         GL11.glHint(GL11.GL_POLYGON_SMOOTH_HINT, GL11.GL_DONT_CARE);
     }
 
-    public static void drawRect(final Rectangle rectangle, final GSColor color) {
+    public static void drawRect(final Rectangle rectangle, final APColor color) {
         drawRect((float) rectangle.x, (float) rectangle.y, (float) (rectangle.x + rectangle.width), (float) (rectangle.y + rectangle.height), color);
     }
 
-    public static void drawRect(final float x, final float y, final float x1, final float y1, final GSColor color) {
+    public static void drawRect(final float x, final float y, final float x1, final float y1, final APColor color) {
         enableGL2D();
         color.glColor();
         drawRect(x, y, x1, y1);
@@ -191,7 +191,7 @@ public class Nametags extends Module {
         GlStateManager.disableDepth();
         String displayName = itemStack.getDisplayName();
         final String s2 = displayName;
-        FontUtils.drawStringWithShadow(HUD.customFont.getValue(), s2, -FontUtils.getStringWidth(HUD.customFont.getValue(), s2) / 2, y, new GSColor(255, 255, 255));
+        FontUtils.drawStringWithShadow(HUD.customFont.getValue(), s2, -FontUtils.getStringWidth(HUD.customFont.getValue(), s2) / 2, y, new APColor(255, 255, 255));
         GlStateManager.enableDepth();
         final float n5 = 2.0f;
         final int n6 = 2;
@@ -209,7 +209,7 @@ public class Nametags extends Module {
             } else {
                 final Enchantment enchantment3 = enchantment;
                 if (enchantnames.getValue()) {
-                    FontUtils.drawStringWithShadow(HUD.customFont.getValue(), this.stringForEnchants(enchantment3, EnchantmentHelper.getEnchantmentLevel(enchantment3, itemStack)), (x * 2), y, new GSColor(255, 255, 255));
+                    FontUtils.drawStringWithShadow(HUD.customFont.getValue(), this.stringForEnchants(enchantment3, EnchantmentHelper.getEnchantmentLevel(enchantment3, itemStack)), (x * 2), y, new APColor(255, 255, 255));
                 } else {
                     return;
                 }
@@ -218,7 +218,7 @@ public class Nametags extends Module {
             }
         }
         if (itemStack.getItem().equals(Items.GOLDEN_APPLE) && itemStack.hasEffect()) {
-            FontUtils.drawStringWithShadow(HUD.customFont.getValue(), "God", (x * 2), y, new GSColor(195, 77, 65));
+            FontUtils.drawStringWithShadow(HUD.customFont.getValue(), "God", (x * 2), y, new APColor(195, 77, 65));
         }
     }
 
@@ -250,7 +250,7 @@ public class Nametags extends Module {
         final float n5 = 0.5f;
         GlStateManager.scale(n5, n4, n5);
         GlStateManager.disableDepth();
-        FontUtils.drawStringWithShadow(HUD.customFont.getValue(), new StringBuilder().insert(0, (int) (n3 * 100.0f)).append('%').toString(), (x * 2), y, new GSColor((int) (red * 255), (int) (green * 255), 0));
+        FontUtils.drawStringWithShadow(HUD.customFont.getValue(), new StringBuilder().insert(0, (int) (n3 * 100.0f)).append('%').toString(), (x * 2), y, new APColor((int) (red * 255), (int) (green * 255), 0));
         GlStateManager.enableDepth();
         final float n6 = 2.0f;
         final int n7 = 2;
@@ -321,10 +321,10 @@ public class Nametags extends Module {
         GlStateManager.enableBlend();
         EntityPlayer entityPlayer2;
         GlStateManager.enableBlend();
-        GSColor color;
+        APColor color;
         if (customColor.getValue()) color = borderColor.getValue();
-        else color = new GSColor(0, 0, 0, 51);
-        drawBorderedRectReliant((float) (-n4 - 1), (float) (-mc.fontRenderer.FONT_HEIGHT), (float) (n4 + 2), 1.0f, 1.8f, new GSColor(0, 4, 0, 85), color);
+        else color = new APColor(0, 0, 0, 51);
+        drawBorderedRectReliant((float) (-n4 - 1), (float) (-mc.fontRenderer.FONT_HEIGHT), (float) (n4 + 2), 1.0f, 1.8f, new APColor(0, 4, 0, 85), color);
         GlStateManager.disableBlend();
         FontUtils.drawStringWithShadow(HUD.customFont.getValue(), this.renderEntityName(entityPlayer), (-n4), (-(mc.fontRenderer.FONT_HEIGHT - 1)), this.renderPing(entityPlayer));
         entityPlayer2 = entityPlayer;
@@ -445,7 +445,7 @@ public class Nametags extends Module {
         GlStateManager.popMatrix();
     }
 
-    private GSColor renderPing(final EntityPlayer entityPlayer) {
+    private APColor renderPing(final EntityPlayer entityPlayer) {
         if (Friends.isFriend(entityPlayer.getName())) {
             return ColorMain.getFriendGSColor();
         }
@@ -453,15 +453,15 @@ public class Nametags extends Module {
             return ColorMain.getEnemyGSColor();
         }
         if (entityPlayer.isInvisible()) {
-            return new GSColor(128, 128, 128);
+            return new APColor(128, 128, 128);
         }
         if (mc.getConnection() != null && mc.getConnection().getPlayerInfo(entityPlayer.getUniqueID()) == null) {
-            return new GSColor(239, 1, 71);
+            return new APColor(239, 1, 71);
         }
         if (entityPlayer.isSneaking()) {
-            return new GSColor(255, 153, 0);
+            return new APColor(255, 153, 0);
         }
-        return new GSColor(255, 255, 255);
+        return new APColor(255, 255, 255);
     }
 
     private String renderEntityName(final EntityPlayer entityPlayer) {

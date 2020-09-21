@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 @Mod.EventBusSubscriber
 public class ElytraFlight extends Module {
-    private final Setting.Double speed = registerDouble("Speed", "Speed", 50, 1, 250);
+    private final Setting.Double speed = registerDouble("Speed", "Speed", 50, 1, 150);
     private final Setting.Mode mode = registerMode("Mode", "Mode", Arrays.asList(
             "Control",
             "Highway",
@@ -21,7 +21,7 @@ public class ElytraFlight extends Module {
     ), "Control");
     private final Setting.Boolean takeoffTimer = registerBoolean("Takeoff Timer", "TakeoffTimer", true);
     private final Setting.Boolean autoTakeoff = registerBoolean("Auto Takeoff", "AutoTakeoff", true);
-    private final Setting.Mode yawMode = registerMode("Yaw", "Yaw", Arrays.asList(
+    private final Setting.Mode yawMode = registerMode("Yaw Mode", "YawMode", Arrays.asList(
             "East",
             "North",
             "West",
@@ -63,20 +63,18 @@ public class ElytraFlight extends Module {
             mc.world == null            ||
             mc.player == null) return;
 
-        mc.player.speedInAir = (float) speed.getValue();
-        CPacketPlayer packet = new CPacketPlayer(false);
-        packet.pitch = wantedPitch;
-        packet.yaw = getWantedYaw();
-        packet.moving = true;
-        packet.x = speed.getValue();
-        packet.z = speed.getValue();
-        mc.getConnection().sendPacket(packet);
-    }
+        if (mc.player.onGround) {
 
-    @SubscribeEvent
-    public void onKeyInput(InputEvent.KeyInputEvent event) {
-        if (Keyboard.getEventKeyState()) {
-            setWantedPitch(Keyboard.getEventKey() == Keyboard.KEY_SPACE);
+        } else {
+            mc.player.speedInAir = (float) speed.getValue();
+            CPacketPlayer packet = new CPacketPlayer(false);
+            setWantedPitch(Keyboard.isKeyDown(Keyboard.KEY_SPACE));
+            packet.pitch = wantedPitch;
+            packet.yaw = getWantedYaw();
+            packet.moving = true;
+            packet.x = speed.getValue();
+            packet.z = speed.getValue();
+            mc.getConnection().sendPacket(packet);
         }
     }
 
@@ -90,7 +88,7 @@ public class ElytraFlight extends Module {
                     wantedPitch = 145f;
                     break;
                 case "Superman":
-                    wantedPitch = mc.player.cameraPitch + 40f;
+                    wantedPitch = mc.player.rotationPitch + 40f;
                     break;
             }
         } else switch (mode.getValue()) {
@@ -101,12 +99,13 @@ public class ElytraFlight extends Module {
                 wantedPitch = 80f;
                 break;
             case "Superman":
-                wantedPitch = mc.player.cameraPitch;
+                wantedPitch = mc.player.rotationPitch;
                 break;
         }
     }
     private float getWantedYaw() {
         switch (yawMode.getValue()) {
+            //TODO fix values here
             case "East":
                 return 0;
             case "North":
@@ -116,7 +115,7 @@ public class ElytraFlight extends Module {
             case "South":
                 return 0;
             default:
-                return mc.player.cameraYaw;
+                return mc.player.rotationYaw;
         }
     }
 }

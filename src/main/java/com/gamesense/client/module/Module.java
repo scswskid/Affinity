@@ -2,7 +2,7 @@ package com.gamesense.client.module;
 
 import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.client.AffinityPlus;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
@@ -130,14 +130,14 @@ public abstract class Module {
         return s;
     }
 
-    protected Setting.ColorSetting registerColor(final String name, final String configname, GSColor color) {
+    protected Setting.ColorSetting registerColor(final String name, final String configname, APColor color) {
         final Setting.ColorSetting s = new Setting.ColorSetting(name, configname, this, getCategory(), false, color);
         AffinityPlus.getInstance().settingsManager.addSetting(s);
         return s;
     }
 
     protected Setting.ColorSetting registerColor(final String name, final String configname) {
-        return registerColor(name, configname, new GSColor(90, 145, 240));
+        return registerColor(name, configname, new APColor(90, 145, 240));
     }
 
     public enum Category {

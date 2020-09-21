@@ -2,7 +2,7 @@ package com.gamesense.client.module.modules.hud;
 
 import com.gamesense.api.players.friends.Friends;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.font.FontUtils;
 import com.gamesense.api.util.world.TpsUtils;
 import com.gamesense.client.AffinityPlus;
@@ -38,7 +38,7 @@ public class HUD extends Module {
     private static final RenderItem itemRender = Minecraft.getMinecraft()
             .getRenderItem();
     public static Setting.Boolean customFont;
-    private static GSColor col;
+    private static APColor col;
     Setting.Boolean PotionEffects;
     Setting.Boolean Watermark;
     Setting.Boolean Welcomer;
@@ -109,7 +109,7 @@ public class HUD extends Module {
     }
 
     public void onRender() {
-        GSColor c = color.getValue();
+        APColor c = color.getValue();
         if (PotionEffects.getValue()) {
             count = 0;
             try {
@@ -156,8 +156,8 @@ public class HUD extends Module {
             drawInventory(inventoryX.getValue(), inventoryY.getValue());
         }
 
-        GSColor on = new GSColor(0, 255, 0);
-        GSColor off = new GSColor(255, 0, 0);
+        APColor on = new APColor(0, 255, 0);
+        APColor off = new APColor(255, 0, 0);
         if (GameSenseInfo.getValue()) {
             if (Type.getValue().equalsIgnoreCase("PvP")) {
                 totems = mc.player.inventory.mainInventory.stream().filter(itemStack -> itemStack.getItem() == Items.TOTEM_OF_UNDYING).mapToInt(ItemStack::getCount).sum();
@@ -287,7 +287,7 @@ public class HUD extends Module {
                             modCount++;
                         }
                         if (color.getRainbow())
-                            col = GSColor.fromHSB(col.getHue() + .02f, col.getSaturation(), col.getBrightness());
+                            col = APColor.fromHSB(col.getHue() + .02f, col.getSaturation(), col.getBrightness());
                     });
         }
 
@@ -315,11 +315,11 @@ public class HUD extends Module {
                 GlStateManager.disableDepth();
 
                 String s = is.getCount() > 1 ? is.getCount() + "" : "";
-                mc.fontRenderer.drawStringWithShadow(s, x + 19 - 2 - mc.fontRenderer.getStringWidth(s), y + 9, new GSColor(255, 255, 255).getRGB());
+                mc.fontRenderer.drawStringWithShadow(s, x + 19 - 2 - mc.fontRenderer.getStringWidth(s), y + 9, new APColor(255, 255, 255).getRGB());
                 float green = ((float) is.getMaxDamage() - (float) is.getItemDamage()) / (float) is.getMaxDamage();
                 float red = 1 - green;
                 int dmg = 100 - (int) (red * 100);
-                FontUtils.drawStringWithShadow(customFont.getValue(), dmg + "", x + 8 - mc.fontRenderer.getStringWidth(dmg + "") / 2, y - 11, new GSColor((int) (red * 255), (int) (green * 255), 0));
+                FontUtils.drawStringWithShadow(customFont.getValue(), dmg + "", x + 8 - mc.fontRenderer.getStringWidth(dmg + "") / 2, y - 11, new APColor((int) (red * 255), (int) (green * 255), 0));
             }
 
             GlStateManager.enableDepth();

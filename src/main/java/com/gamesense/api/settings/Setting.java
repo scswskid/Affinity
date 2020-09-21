@@ -1,6 +1,6 @@
 package com.gamesense.api.settings;
 
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.client.module.Module;
 
 import java.util.List;
@@ -150,22 +150,22 @@ public abstract class Setting {
     // Color config added by lukflug
     public static class ColorSetting extends Setting {
         private boolean rainbow;
-        private GSColor value;
+        private APColor value;
 
-        public ColorSetting(final String name, final String configname, final Module parent, final Module.Category category, boolean rainbow, final GSColor value) {
+        public ColorSetting(final String name, final String configname, final Module parent, final Module.Category category, boolean rainbow, final APColor value) {
             super(name, configname, parent, category, Type.COLOR);
             this.rainbow = rainbow;
             this.value = value;
         }
 
-        public GSColor getValue() {
+        public APColor getValue() {
             if (rainbow) {
-                return GSColor.fromHSB((System.currentTimeMillis() % (360 * 32)) / (360f * 32), 1, 1);
+                return APColor.fromHSB((System.currentTimeMillis() % (360 * 32)) / (360f * 32), 1, 1);
             }
             return value;
         }
 
-        public void setValue(boolean rainbow, final GSColor value) {
+        public void setValue(boolean rainbow, final APColor value) {
             this.rainbow = rainbow;
             this.value = value;
         }
@@ -175,11 +175,11 @@ public abstract class Setting {
         }
 
         public void fromInteger(int number) {
-            value = new GSColor(number & 0xFFFFFF);
+            value = new APColor(number & 0xFFFFFF);
             rainbow = ((number & 0x1000000) != 0);
         }
 
-        public GSColor getColor() {
+        public APColor getColor() {
             return value;
         }
 

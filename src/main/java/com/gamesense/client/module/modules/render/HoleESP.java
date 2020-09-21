@@ -2,7 +2,7 @@ package com.gamesense.client.module.modules.render;
 
 import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.render.GameSenseTessellator;
 import com.gamesense.api.util.world.GeometryMasks;
 import com.gamesense.client.module.Module;
@@ -67,8 +67,8 @@ public class HoleESP extends Module {
         mode = registerMode("Mode", "Mode", modes, "Air");
 
         width = registerInteger("Width", "Width", 1, 1, 10);
-        bedrockColor = registerColor("Bedrock Color", "BedrockColor", new GSColor(0, 255, 0));
-        otherColor = registerColor("Obsidian Color", "ObsidianColor", new GSColor(255, 0, 0));
+        bedrockColor = registerColor("Bedrock Color", "BedrockColor", new APColor(0, 255, 0));
+        otherColor = registerColor("Obsidian Color", "ObsidianColor", new APColor(255, 0, 0));
     }
 
     //defines the area for the client to search
@@ -161,17 +161,17 @@ public class HoleESP extends Module {
         GameSenseTessellator.release();
     }
 
-    private GSColor getColor(boolean isBedrock, int alpha) {
-        GSColor c;
+    private APColor getColor(boolean isBedrock, int alpha) {
+        APColor c;
         if (isBedrock) c = bedrockColor.getValue();
         else c = otherColor.getValue();
-        return new GSColor(c, alpha);
+        return new APColor(c, alpha);
     }
 
     //renders air boxes
     private void drawBox(BlockPos blockPos, boolean isBedrock) {
         if (type.getValue().equalsIgnoreCase("Fill") || type.getValue().equalsIgnoreCase("Both")) {
-            GSColor color = getColor(isBedrock, 50);
+            APColor color = getColor(isBedrock, 50);
             AxisAlignedBB bb = mc.world.getBlockState(blockPos).getSelectedBoundingBox(mc.world, blockPos);
             if (mode.getValue().equalsIgnoreCase("Air")) {
                 if (this.flatOwn.getValue() && blockPos.equals(new BlockPos(mc.player.posX, mc.player.posY, mc.player.posZ)))
@@ -185,7 +185,7 @@ public class HoleESP extends Module {
     //renders ground boxes
     private void drawDownBox(BlockPos blockPos, boolean isBedrock) {
         if (type.getValue().equalsIgnoreCase("Fill") || type.getValue().equalsIgnoreCase("Both")) {
-            GSColor color = getColor(isBedrock, 50);
+            APColor color = getColor(isBedrock, 50);
             AxisAlignedBB bb = mc.world.getBlockState(blockPos).getSelectedBoundingBox(mc.world, blockPos);
             if (mode.getValue().equalsIgnoreCase("Ground")) {
                 GameSenseTessellator.drawDownBox(blockPos, color, GeometryMasks.Quad.ALL);
@@ -195,7 +195,7 @@ public class HoleESP extends Module {
 
     private void drawFlat(BlockPos blockPos, boolean isBedrock) {
         if (type.getValue().equalsIgnoreCase("Fill") || type.getValue().equalsIgnoreCase("Both")) {
-            GSColor color = getColor(isBedrock, 50);
+            APColor color = getColor(isBedrock, 50);
             AxisAlignedBB bb = mc.world.getBlockState(blockPos).getSelectedBoundingBox(mc.world, blockPos);
             if (mode.getValue().equalsIgnoreCase("Flat")) {
                 GameSenseTessellator.drawBox(blockPos, color, GeometryMasks.Quad.DOWN);
@@ -204,7 +204,7 @@ public class HoleESP extends Module {
     }
 
     private void drawOutline(BlockPos blockPos, int width, boolean isBedrock) {
-        GSColor color = getColor(isBedrock, 255);
+        APColor color = getColor(isBedrock, 255);
         if (type.getValue().equalsIgnoreCase("Outline") || type.getValue().equalsIgnoreCase("Both")) {
             if (mode.getValue().equalsIgnoreCase("Air")) {
                 if (this.flatOwn.getValue() && blockPos.equals(new BlockPos(mc.player.posX, mc.player.posY, mc.player.posZ))) {

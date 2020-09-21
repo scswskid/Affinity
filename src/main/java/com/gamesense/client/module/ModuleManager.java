@@ -35,6 +35,7 @@ public class ModuleManager {
         addMod(new FastBow());
         addMod(new HoleFill());
         addMod(new KillAura());
+        addMod(new BedAura());
         addMod(new Auto32K());
         addMod(new BruceAura());
         addMod(new YakgodAura());
@@ -52,7 +53,8 @@ public class ModuleManager {
         addMod(new NoSwing());
         addMod(new PortalGodMode());
         //Movement
-        addMod(new ElytraFlight());
+        //addMod(new ElytraFlight());
+        addMod(new LongJump());
         addMod(new FastFall());
         addMod(new PlayerTweaks());
         addMod(new ReverseStep());
@@ -69,6 +71,7 @@ public class ModuleManager {
         addMod(new ChatSuffix());
         addMod(new DiscordRPCModule());
         addMod(new FastPlace());
+        addMod(new Refill());
         addMod(new SkiddaOnBottomDupe());
         addMod(new FakePlayer());
         addMod(new MCF());

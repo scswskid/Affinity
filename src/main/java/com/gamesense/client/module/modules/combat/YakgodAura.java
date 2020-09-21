@@ -26,7 +26,7 @@ public class YakgodAura extends Module {
     private Setting.Boolean ignoreWalls = registerBoolean("Ignore Walls", "IgnoreWalls", true);
     private Setting.Boolean switchTo32k = registerBoolean("32k Switch", "32kSwitch", true);
     private Setting.Boolean onlyUse32k = registerBoolean("32k Only", "32kOnly", true);
-    private Setting.Double hitRange = registerDouble("Hit Range", "HitRange", 5.5d, 0.0d, 6.0d);
+    private Setting.Double hitRange = registerDouble("Hit Range", "HitRange", 5.5d, 0.0d, 25.0d);
     private Setting.Integer waitTick = registerInteger("Tick Delay", "TickDelay", 3, 0, 20);
 
     private int waitCounter = 0;

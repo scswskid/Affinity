@@ -2,7 +2,7 @@ package com.gamesense.client.module.modules.render;
 
 import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.render.GameSenseTessellator;
 import com.gamesense.api.util.world.GeometryMasks;
 import com.gamesense.client.module.Module;
@@ -30,7 +30,7 @@ public class BlockHighlight extends Module {
         RayTraceResult ray = mc.objectMouseOver;
         AxisAlignedBB bb;
         BlockPos pos;
-        GSColor c2 = new GSColor(color.getValue(), 50);
+        APColor c2 = new APColor(color.getValue(), 50);
         if (ray != null && ray.typeOfHit == RayTraceResult.Type.BLOCK) {
             pos = ray.getBlockPos();
             bb = mc.world.getBlockState(pos).getSelectedBoundingBox(mc.world, pos);

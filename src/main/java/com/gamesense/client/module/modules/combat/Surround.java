@@ -21,9 +21,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
-import org.lwjgl.input.Keyboard;
 
 import static com.gamesense.api.util.world.BlockUtils.faceVectorPacketInstant;
 
@@ -62,7 +59,6 @@ public class Surround extends Module {
 
     public void onEnable() {
         MinecraftForge.EVENT_BUS.register(this);
-
         if (mc.player == null) {
             disable();
             return;
@@ -70,11 +66,6 @@ public class Surround extends Module {
 
         if (chatMsg.getValue()) {
             Command.sendClientMessage("\u00A7aSurround turned ON!");
-        }
-
-        if (centerPlayer.getValue() && mc.player.onGround) {
-            mc.player.motionX = 0;
-            mc.player.motionZ = 0;
         }
 
         centeredBlock = getCenterOfBlock(mc.player.posX, mc.player.posY, mc.player.posY);
@@ -117,34 +108,21 @@ public class Surround extends Module {
 
     public void onUpdate() {
         if (mc.player == null) {
-            disable();
+            this.disable();
             return;
         }
+
+        if (disableOnJump.getValue())
+            if (!mc.player.onGround) {
+                this.disable();
+                return;
+            }
 
         if (mc.player.posY <= 0) {
             return;
         }
 
-        if (firstRun) {
-            firstRun = false;
-            if (findObsidianSlot() == -1) {
-                return;
-            }
-        } else {
-            if (delayTimeTicks < tickDelay.getValue()) {
-                delayTimeTicks++;
-                return;
-            } else {
-                delayTimeTicks = 0;
-            }
-        }
-
-        if (findObsidianSlot() == -1) {
-            return;
-        }
-
         if (centerPlayer.getValue() && centeredBlock != Vec3d.ZERO && mc.player.onGround) {
-
             double xDeviation = Math.abs(centeredBlock.x - mc.player.posX);
             double zDeviation = Math.abs(centeredBlock.z - mc.player.posZ);
 
@@ -172,6 +150,24 @@ public class Surround extends Module {
                 mc.player.connection.sendPacket(new CPacketPlayer.Position(newX, mc.player.posY, newZ, true));
                 mc.player.setPosition(newX, mc.player.posY, newZ);
             }
+        }
+
+        if (firstRun) {
+            firstRun = false;
+            if (findObsidianSlot() == -1) {
+                return;
+            }
+        } else {
+            if (delayTimeTicks < tickDelay.getValue()) {
+                delayTimeTicks++;
+                return;
+            } else {
+                delayTimeTicks = 0;
+            }
+        }
+
+        if (findObsidianSlot() == -1) {
+            return;
         }
 
         if (triggerSurround.getValue() && runTimeTicks >= timeOutTicks.getValue()) {
@@ -215,13 +211,6 @@ public class Surround extends Module {
             offsetSteps++;
         }
         runTimeTicks++;
-    }
-
-    @SubscribeEvent
-    public void onKeyboardPressed(InputEvent.KeyInputEvent event) {
-        if (Keyboard.getEventKey() != Keyboard.KEY_SPACE) return;
-
-        if (disableOnJump.getValue()) this.disable();
     }
 
     private int findObsidianSlot() {

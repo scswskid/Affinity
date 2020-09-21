@@ -4,7 +4,7 @@ import com.gamesense.api.event.events.PacketEvent;
 import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.players.friends.Friends;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.font.FontUtils;
 import com.gamesense.api.util.render.GameSenseTessellator;
 import com.gamesense.client.AffinityPlus;
@@ -13,6 +13,7 @@ import com.gamesense.client.module.Module;
 import com.gamesense.client.module.ModuleManager;
 import com.gamesense.client.module.modules.hud.HUD;
 import com.gamesense.client.module.modules.misc.AutoGG;
+import com.mojang.realmsclient.gui.ChatFormatting;
 import me.zero.alpine.listener.EventHandler;
 import me.zero.alpine.listener.Listener;
 import net.minecraft.client.Minecraft;
@@ -155,7 +156,7 @@ public class AutoCrystalRewrite extends Module {
 
         ArrayList<String> hudModes = new ArrayList<>();
         hudModes.add("Mode");
-        hudModes.add("Will Kill");
+        hudModes.add("Current Target");
         hudModes.add("Both");
         hudModes.add("None");
 
@@ -311,10 +312,10 @@ public class AutoCrystalRewrite extends Module {
     @Override public void onWorldRender(RenderEvent event) {
         if (render != null) {
             GameSenseTessellator.prepare(7);
-            GameSenseTessellator.drawBox(render, new GSColor(color.getValue(), 50), 63);
+            GameSenseTessellator.drawBox(render, new APColor(color.getValue(), 50), 63);
             GameSenseTessellator.release();
             GameSenseTessellator.prepare(7);
-            GameSenseTessellator.drawBoundingBoxBlockPos(render, 1.00f, new GSColor(color.getValue(), 255));
+            GameSenseTessellator.drawBoundingBoxBlockPos(render, 1.00f, new APColor(color.getValue(), 255));
             GameSenseTessellator.release();
         }
 
@@ -327,7 +328,7 @@ public class AutoCrystalRewrite extends Module {
                 GlStateManager.disableDepth();
                 GlStateManager.translate(-(mc.fontRenderer.getStringWidth(damageText) / 2.0d), 0, 0);
                 //mc.fontRenderer.drawStringWithShadow(damageText, 0, 0, 0xFFffffff);
-                FontUtils.drawStringWithShadow(HUD.customFont.getValue(), damageText, 0, 0, new GSColor(255, 255, 255));
+                FontUtils.drawStringWithShadow(HUD.customFont.getValue(), damageText, 0, 0, new APColor(255, 255, 255));
                 GlStateManager.popMatrix();
             }
         }
@@ -695,8 +696,9 @@ public class AutoCrystalRewrite extends Module {
     }
     private static void doCancelCrystal(EntityEnderCrystal crystal) {
         crystal.setDead();
-        mc.world.removeAllEntities();
-        mc.world.getLoadedEntityList();}
+        mc.world.removeEntity(crystal);
+        mc.world.getLoadedEntityList();
+    }
     private static void addToAutoGG(String name) {
         if (ModuleManager.isModuleEnabled("AutoGG"))
             AutoGG.INSTANCE.addTargetedPlayer(name);
@@ -714,5 +716,29 @@ public class AutoCrystalRewrite extends Module {
                 togglePitch = true;
             }
         }
+    }
+
+    //IRRELEVANT OVERRIDES
+    @Override
+    public String getHudInfo() {
+        String t = "";
+        if (hudDisplay.getValue().equalsIgnoreCase("Mode")) {
+            if (breakMode.getValue().equalsIgnoreCase("All")) {
+                t = "[" + ChatFormatting.WHITE + "All" + ChatFormatting.GRAY + "]";
+            }
+            if (breakMode.getValue().equalsIgnoreCase("Smart")) {
+                t = "[" + ChatFormatting.WHITE + "Smart" + ChatFormatting.GRAY + "]";
+            }
+            if (breakMode.getValue().equalsIgnoreCase("Only Own")) {
+                t = "[" + ChatFormatting.WHITE + "Own" + ChatFormatting.GRAY + "]";
+            }
+        }
+        if (hudDisplay.getValue().equalsIgnoreCase("None")) {
+            t = "";
+        }
+        if (hudDisplay.getValue().equalsIgnoreCase("Current Target")) {
+            //TODO current target
+        }
+        return t;
     }
 }

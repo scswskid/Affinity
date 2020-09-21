@@ -1,13 +1,13 @@
 package com.gamesense.api.util.font;
 
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.client.AffinityPlus;
 import net.minecraft.client.Minecraft;
 
 public class FontUtils {
     private static final Minecraft mc = Minecraft.getMinecraft();
 
-    public static float drawStringWithShadow(boolean customFont, String text, int x, int y, GSColor color) {
+    public static float drawStringWithShadow(boolean customFont, String text, int x, int y, APColor color) {
         if (customFont) return AffinityPlus.fontRenderer.drawStringWithShadow(text, x, y, color);
         else return mc.fontRenderer.drawStringWithShadow(text, x, y, color.getRGB());
     }

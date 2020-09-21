@@ -1,6 +1,6 @@
 package com.gamesense.client.clickgui.frame;
 
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.client.module.modules.hud.ClickGuiModule;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -17,12 +17,12 @@ public class Renderer {
      */
 
     //no gradient, single color
-    public static void drawRectStatic(int leftX, int leftY, int rightX, int rightY, GSColor color) {
+    public static void drawRectStatic(int leftX, int leftY, int rightX, int rightY, APColor color) {
         Gui.drawRect(leftX, leftY, rightX, rightY, color.getRGB());
     }
 
     //top down color gradient
-    public static void drawRectGradient(int leftX, int leftY, int rightX, int rightY, GSColor startColor, GSColor endColor) {
+    public static void drawRectGradient(int leftX, int leftY, int rightX, int rightY, APColor startColor, APColor endColor) {
         float s = (float) (startColor.getRGB() >> 24 & 255) / 255.0F;
         float s1 = (float) (startColor.getRGB() >> 16 & 255) / 255.0F;
         float s2 = (float) (startColor.getRGB() >> 8 & 255) / 255.0F;
@@ -50,24 +50,24 @@ public class Renderer {
         GlStateManager.enableTexture2D();
     }
 
-    public static GSColor getMainColor() {
+    public static APColor getMainColor() {
         return ClickGuiModule.guiColor.getValue();
     }
 
-    public static GSColor getTransColor(boolean hovered) {
-        GSColor transColor = new GSColor(195, 195, 195, ClickGuiModule.opacity.getValue() - 50);
+    public static APColor getTransColor(boolean hovered) {
+        APColor transColor = new APColor(195, 195, 195, ClickGuiModule.opacity.getValue() - 50);
 
         if (ClickGuiModule.backgroundColor.getValue().equalsIgnoreCase("Black")) {
-            transColor = new GSColor(0, 0, 0, ClickGuiModule.opacity.getValue() - 50);
+            transColor = new APColor(0, 0, 0, ClickGuiModule.opacity.getValue() - 50);
         } else if (ClickGuiModule.backgroundColor.getValue().equalsIgnoreCase("Silver")) {
-            transColor = new GSColor(100, 100, 100, ClickGuiModule.opacity.getValue() - 50);
+            transColor = new APColor(100, 100, 100, ClickGuiModule.opacity.getValue() - 50);
         }
 
-        if (hovered) return new GSColor(transColor.darker().darker());
+        if (hovered) return new APColor(transColor.darker().darker());
         return transColor;
     }
 
-    public static GSColor getFontColor() {
-        return new GSColor(255, 255, 255);
+    public static APColor getFontColor() {
+        return new APColor(255, 255, 255);
     }
 }

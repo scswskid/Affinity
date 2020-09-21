@@ -4,7 +4,7 @@ import com.gamesense.api.event.events.PacketEvent;
 import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.players.friends.Friends;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.font.FontUtils;
 import com.gamesense.api.util.render.GameSenseTessellator;
 import com.gamesense.client.AffinityPlus;
@@ -551,10 +551,10 @@ public class AutoCrystal extends Module {
     public void onWorldRender(RenderEvent event) {
         if (this.render != null) {
             GameSenseTessellator.prepare(7);
-            GameSenseTessellator.drawBox(this.render, new GSColor(color.getValue(), 50), 63);
+            GameSenseTessellator.drawBox(this.render, new APColor(color.getValue(), 50), 63);
             GameSenseTessellator.release();
             GameSenseTessellator.prepare(7);
-            GameSenseTessellator.drawBoundingBoxBlockPos(this.render, 1.00f, new GSColor(color.getValue(), 255));
+            GameSenseTessellator.drawBoundingBoxBlockPos(this.render, 1.00f, new APColor(color.getValue(), 255));
             GameSenseTessellator.release();
         }
 
@@ -567,7 +567,7 @@ public class AutoCrystal extends Module {
                 GlStateManager.disableDepth();
                 GlStateManager.translate(-(mc.fontRenderer.getStringWidth(damageText) / 2.0d), 0, 0);
                 //mc.fontRenderer.drawStringWithShadow(damageText, 0, 0, 0xFFffffff);
-                FontUtils.drawStringWithShadow(HUD.customFont.getValue(), damageText, 0, 0, new GSColor(255, 255, 255));
+                FontUtils.drawStringWithShadow(HUD.customFont.getValue(), damageText, 0, 0, new APColor(255, 255, 255));
                 GlStateManager.popMatrix();
             }
         }

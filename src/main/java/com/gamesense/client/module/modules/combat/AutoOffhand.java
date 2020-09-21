@@ -115,15 +115,18 @@ public final class AutoOffhand extends Module {
             }
 
             if (l_Slot != -1) {
-                mc.playerController.windowClick(mc.player.inventoryContainer.windowId, l_Slot, 0,
-                        ClickType.PICKUP, mc.player);
-                mc.playerController.windowClick(mc.player.inventoryContainer.windowId, 45, 0, ClickType.PICKUP,
-                        mc.player);
+                try {
+                    mc.playerController.windowClick(mc.player.inventoryContainer.windowId, l_Slot, 0,
+                            ClickType.PICKUP, mc.player);
 
-                /// @todo: this might cause desyncs, we need a callback for windowclicks for transaction complete packet.
-                mc.playerController.windowClick(mc.player.inventoryContainer.windowId, l_Slot, 0,
-                        ClickType.PICKUP, mc.player);
-                mc.playerController.updateController();
+                    mc.playerController.windowClick(mc.player.inventoryContainer.windowId, 45, 0, ClickType.PICKUP,
+                            mc.player);
+
+                    /// @todo: this might cause desyncs, we need a callback for windowclicks for transaction complete packet.
+                    mc.playerController.windowClick(mc.player.inventoryContainer.windowId, l_Slot, 0,
+                            ClickType.PICKUP, mc.player);
+                    mc.playerController.updateController();
+                } catch (Exception ignored) {}
             }
         }
     }

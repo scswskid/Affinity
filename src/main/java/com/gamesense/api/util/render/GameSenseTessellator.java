@@ -1,6 +1,6 @@
 package com.gamesense.api.util.render;
 
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.Wrapper;
 import com.gamesense.api.util.world.GeometryMasks;
 import net.minecraft.client.Minecraft;
@@ -70,27 +70,27 @@ public class GameSenseTessellator extends Tessellator {
         GL11.glColor4f(1, 1, 1, 1);
     }
 
-    public static void drawBox(AxisAlignedBB bb, GSColor color, int sides) {
+    public static void drawBox(AxisAlignedBB bb, APColor color, int sides) {
         drawBox(INSTANCE.getBuffer(), bb, color, sides);
     }
 
-    public static void drawBox(BlockPos blockPos, GSColor color, int sides) {
+    public static void drawBox(BlockPos blockPos, APColor color, int sides) {
         drawBox(INSTANCE.getBuffer(), blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, 1, 1, color, sides);
     }
 
-    public static void drawBox(BufferBuilder buffer, AxisAlignedBB bb, GSColor color, int sides) {
+    public static void drawBox(BufferBuilder buffer, AxisAlignedBB bb, APColor color, int sides) {
         drawBox(buffer, (float) bb.minX, (float) bb.minY, (float) bb.minZ, (float) (bb.maxX - bb.minX), (float) (bb.maxY - bb.minY), (float) (bb.maxZ - bb.minZ), color, sides);
     }
 
-    public static void drawDownBox(BlockPos blockPos, GSColor color, int sides) {
+    public static void drawDownBox(BlockPos blockPos, APColor color, int sides) {
         drawDownBox(INSTANCE.getBuffer(), blockPos.getX(), blockPos.getY(), blockPos.getZ(), 1, 1, 1, color, sides);
     }
 
-    public static void drawDownBox(BufferBuilder buffer, float x, float y, float z, float w, float h, float d, GSColor color, int sides) {
+    public static void drawDownBox(BufferBuilder buffer, float x, float y, float z, float w, float h, float d, APColor color, int sides) {
         drawBox(buffer, x, y, z, w, -h, d, color, sides);
     }
 
-    public static void drawBox(BufferBuilder buffer, float x, float y, float z, float w, float h, float d, GSColor color, int sides) {
+    public static void drawBox(BufferBuilder buffer, float x, float y, float z, float w, float h, float d, APColor color, int sides) {
         int r = color.getRed(), g = color.getGreen(), b = color.getBlue(), a = color.getAlpha();
         if ((sides & GeometryMasks.Quad.DOWN) != 0) {
             buffer.pos(x + w, y, z).color(r, g, b, a).endVertex();
@@ -150,7 +150,7 @@ public class GameSenseTessellator extends Tessellator {
         GL11.glPopMatrix();
     }
 
-    public static void drawBoundingBox(final AxisAlignedBB bb, final float width, GSColor color) {
+    public static void drawBoundingBox(final AxisAlignedBB bb, final float width, APColor color) {
         int red = color.getRed(), green = color.getGreen(), blue = color.getBlue(), alpha = color.getAlpha();
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
@@ -185,7 +185,7 @@ public class GameSenseTessellator extends Tessellator {
         GlStateManager.popMatrix();
     }
 
-    public static void drawBoundingBoxBlockPos(BlockPos bp, float width, GSColor color) {
+    public static void drawBoundingBoxBlockPos(BlockPos bp, float width, APColor color) {
         int r = color.getRed(), g = color.getGreen(), b = color.getBlue(), alpha = color.getAlpha();
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
@@ -235,7 +235,7 @@ public class GameSenseTessellator extends Tessellator {
         GlStateManager.popMatrix();
     }
 
-    public static void drawBoundingBoxBlockPos2(BlockPos bp, float width, GSColor color) {
+    public static void drawBoundingBoxBlockPos2(BlockPos bp, float width, APColor color) {
         int r = color.getRed(), g = color.getGreen(), b = color.getBlue(), alpha = color.getAlpha();
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
@@ -285,7 +285,7 @@ public class GameSenseTessellator extends Tessellator {
         GlStateManager.popMatrix();
     }
 
-    public static void drawBoundingBoxBottom2(BlockPos bp, float width, GSColor color) {
+    public static void drawBoundingBoxBottom2(BlockPos bp, float width, APColor color) {
         int red = color.getRed(), green = color.getGreen(), blue = color.getBlue(), alpha = color.getAlpha();
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();

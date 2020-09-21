@@ -2,7 +2,7 @@ package com.gamesense.client.module.modules.render;
 
 import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.render.GameSenseTessellator;
 import com.gamesense.client.module.Module;
 import net.minecraft.tileentity.*;
@@ -22,16 +22,14 @@ public class StorageESP extends Module {
 
     public void setup() {
         w = registerInteger("Width", "Width", 2, 1, 10);
-        c1 = registerColor("Chest Color", "ChestColor", new GSColor(255, 255, 0));
-        c2 = registerColor("EnderChest Color", "EnderChestColor", new GSColor(180, 70, 200));
-        c3 = registerColor("Shulker Color", "ShulkerBoxColor", new GSColor(150, 150, 150));
-        c4 = registerColor("Other Color", "OtherColor", new GSColor(255, 0, 0));
+        c1 = registerColor("Chest Color", "ChestColor", new APColor(255, 255, 0));
+        c2 = registerColor("EnderChest Color", "EnderChestColor", new APColor(180, 70, 200));
+        c3 = registerColor("Shulker Color", "ShulkerBoxColor", new APColor(150, 150, 150));
+        c4 = registerColor("Other Color", "OtherColor", new APColor(255, 0, 0));
     }
 
     public void onUpdate() {
-        mc.world.loadedTileEntityList.forEach(e -> {
-            chests.put(e, "");
-        });
+        mc.world.loadedTileEntityList.forEach(e -> chests.put(e, ""));
     }
 
     public void onWorldRender(RenderEvent event) {
@@ -44,11 +42,11 @@ public class StorageESP extends Module {
                     if (c instanceof TileEntityEnderChest)
                         GameSenseTessellator.drawBoundingBox(mc.world.getBlockState(c.getPos()).getSelectedBoundingBox(mc.world, c.getPos()), (float) w.getValue(), c2.getValue());
                     if (c instanceof TileEntityShulkerBox)
-                        GameSenseTessellator.drawBoundingBox(mc.world.getBlockState(c.getPos()).getSelectedBoundingBox(mc.world, c.getPos()), (float) w.getValue(), c4.getValue());
+                        GameSenseTessellator.drawBoundingBox(mc.world.getBlockState(c.getPos()).getSelectedBoundingBox(mc.world, c.getPos()), (float) w.getValue(), c3.getValue());
                     if (c instanceof TileEntityDispenser
                             || c instanceof TileEntityFurnace
                             || c instanceof TileEntityHopper)
-                        GameSenseTessellator.drawBoundingBox(mc.world.getBlockState(c.getPos()).getSelectedBoundingBox(mc.world, c.getPos()), (float) w.getValue(), c3.getValue());
+                        GameSenseTessellator.drawBoundingBox(mc.world.getBlockState(c.getPos()).getSelectedBoundingBox(mc.world, c.getPos()), (float) w.getValue(), c4.getValue());
                 }
             });
             GameSenseTessellator.releaseGL();

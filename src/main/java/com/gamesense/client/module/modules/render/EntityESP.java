@@ -2,7 +2,7 @@ package com.gamesense.client.module.modules.render;
 
 import com.gamesense.api.event.events.RenderEvent;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.GSColor;
+import com.gamesense.api.util.APColor;
 import com.gamesense.api.util.render.GameSenseTessellator;
 import com.gamesense.api.util.world.GeometryMasks;
 import com.gamesense.client.module.Module;
@@ -41,9 +41,9 @@ public class EntityESP extends Module {
     }
 
     public void onWorldRender(RenderEvent event) {
-        GSColor rgbColor = color.getValue();
-        GSColor c = new GSColor(rgbColor, 50);
-        GSColor c2 = new GSColor(rgbColor, 255);
+        APColor rgbColor = color.getValue();
+        APColor c = new APColor(rgbColor, 50);
+        APColor c2 = new APColor(rgbColor, 255);
         boolean drawBox = renderMode.getValue().equalsIgnoreCase("Box");
         boolean drawOutline = renderMode.getValue().equalsIgnoreCase("Box") || renderMode.getValue().equalsIgnoreCase("Outline");
         boolean drawGlow = renderMode.getValue().equalsIgnoreCase("Glow");

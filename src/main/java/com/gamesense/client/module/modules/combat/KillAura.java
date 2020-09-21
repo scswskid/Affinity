@@ -9,6 +9,9 @@ import com.gamesense.client.module.ModuleManager;
 import me.zero.alpine.listener.EventHandler;
 import me.zero.alpine.listener.Listener;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.CPacketPlayer;
@@ -20,10 +23,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class KillAura extends Module {
-    private Setting.Boolean swordOnly;
-    private Setting.Boolean caCheck;
-    private Setting.Boolean criticals;
-    private Setting.Double range;
+    Setting.Boolean players;
+    Setting.Boolean hostileMobs;
+    Setting.Boolean passiveMobs;
+    Setting.Boolean swordOnly;
+    Setting.Boolean caCheck;
+    Setting.Boolean criticals;
+    Setting.Double range;
     private boolean isAttacking = false;
     @EventHandler
     private final Listener<PacketEvent.Send> listener = new Listener<>(event -> {
@@ -40,6 +46,9 @@ public class KillAura extends Module {
     }
 
     public void setup() {
+        players = registerBoolean("Players", "Players", true);
+        passiveMobs = registerBoolean("Animals", "Animals", false);
+        hostileMobs = registerBoolean("Monsters", "Monsters", false);
         range = registerDouble("Range", "Range", 5, 0, 10);
         swordOnly = registerBoolean("Sword Only", "SwordOnly", true);
         criticals = registerBoolean("Criticals", "Criticals", true);
@@ -52,19 +61,17 @@ public class KillAura extends Module {
                 .filter(entity -> entity != mc.player)
                 .filter(entity -> mc.player.getDistance(entity) <= range.getValue())
                 .filter(entity -> !entity.isDead)
-                .filter(entity -> entity instanceof EntityPlayer)
-                .filter(entity -> ((EntityPlayer) entity).getHealth() > 0)
-                .filter(entity -> !Friends.isFriend(entity.getName()))
+                .filter(entity -> attackCheck(entity))
                 .sorted(Comparator.comparing(e -> mc.player.getDistance(e)))
                 .collect(Collectors.toList());
 
         targets.forEach(target -> {
-            if (swordOnly.getValue())
-                if (!(mc.player.getHeldItemMainhand().getItem() instanceof ItemSword)) return;
-
-            if (caCheck.getValue())
-                if (((AutoCrystal) ModuleManager.getModuleByName("AutoCrystalGS")).isActive) return;
-
+            if (swordOnly.getValue() && !(mc.player.getHeldItemMainhand().getItem() instanceof ItemSword)) {
+                return;
+            }
+            if (caCheck.getValue() && ((AutoCrystal) ModuleManager.getModuleByName("AutoCrystalGS")).isActive) {
+                return;
+            }
             attack(target);
         });
     }
@@ -84,5 +91,20 @@ public class KillAura extends Module {
             mc.player.swingArm(EnumHand.MAIN_HAND);
             isAttacking = false;
         }
+    }
+
+    private boolean attackCheck(Entity entity) {
+
+        if (players.getValue() && entity instanceof EntityPlayer && !Friends.isFriend(entity.getName())) {
+            if (((EntityPlayer) entity).getHealth() > 0) {
+                return true;
+            }
+        }
+
+        if (passiveMobs.getValue() && entity instanceof EntityAnimal) {
+            return !(entity instanceof EntityTameable);
+        }
+
+        return hostileMobs.getValue() && entity instanceof EntityMob;
     }
 }
