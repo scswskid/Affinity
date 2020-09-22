@@ -66,7 +66,6 @@ public class ElytraFlight extends Module {
         if (mc.player.onGround) {
 
         } else {
-            mc.player.speedInAir = (float) speed.getValue();
             CPacketPlayer packet = new CPacketPlayer(false);
             setWantedPitch(Keyboard.isKeyDown(Keyboard.KEY_SPACE));
             packet.pitch = wantedPitch;

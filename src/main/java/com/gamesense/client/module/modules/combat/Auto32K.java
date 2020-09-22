@@ -5,6 +5,7 @@ import com.gamesense.api.util.world.BlockUtils;
 import com.gamesense.client.AffinityPlus;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.module.Module;
+import com.gamesense.client.module.ModuleManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLiquid;
@@ -47,7 +48,7 @@ public class Auto32K extends Module {
 
     @Override
     protected void onEnable() {
-        if (Auto32K.mc.player == null || AffinityPlus.getInstance().moduleManager.isModuleEnabled("Freecam")) {
+        if (Auto32K.mc.player == null || ModuleManager.isModuleEnabled("Freecam")) {
             this.disable();
             return;
         }
@@ -68,7 +69,7 @@ public class Auto32K extends Module {
                 this.hopperSlot = i;
                 continue;
             }
-            if (BlockUtils.shulkerList.contains((Object) block)) {
+            if (BlockUtils.shulkerList.contains(block)) {
                 this.shulkerSlot = i;
                 continue;
             }
@@ -85,21 +86,21 @@ public class Auto32K extends Module {
         }
         if (this.obiSlot == -1 || this.dispenserSlot == -1 || this.shulkerSlot == -1 || this.redstoneSlot == -1 || this.hopperSlot == -1) {
             if (this.debugMessages.getValue()) {
-                Command.sendClientMessage("[Auto32k] Items missing, disabling.");
+                Command.sendClientMessage("Auto32k: Items missing, disabling.");
             }
             this.disable();
             return;
         }
-        if (Auto32K.mc.objectMouseOver == null || Auto32K.mc.objectMouseOver.getBlockPos() == null || Auto32K.mc.objectMouseOver.getBlockPos().up() == null) {
+        if (mc.objectMouseOver == null || mc.objectMouseOver.getBlockPos() == null || mc.objectMouseOver.getBlockPos().up() == null) {
             if (this.debugMessages.getValue()) {
-                Command.sendClientMessage("[Auto32k] Not a valid place target, disabling.");
+                Command.sendClientMessage("Auto32k: Not a valid place target, disabling.");
             }
             this.disable();
             return;
         }
         this.placeTarget = Auto32K.mc.objectMouseOver.getBlockPos().up();
-        if (this.debugMessages.getValue() == false) return;
-        Command.sendClientMessage("[Auto32k] Place Target: " + this.placeTarget.x + " " + this.placeTarget.y + " " + this.placeTarget.z + " Distance: " + df.format(Auto32K.mc.player.getPositionVector().distanceTo(new Vec3d(this.placeTarget))));
+        if (!this.debugMessages.getValue()) return;
+        Command.sendClientMessage("Auto32k: Place Target is " + this.placeTarget.x + " " + this.placeTarget.y + " " + this.placeTarget.z + " Distance: " + df.format(Auto32K.mc.player.getPositionVector().distanceTo(new Vec3d(this.placeTarget))));
     }
 
     @Override
@@ -109,39 +110,39 @@ public class Auto32K extends Module {
             return;
         }
         if (this.stage == 0) {
-            Auto32K.mc.player.inventory.currentItem = this.obiSlot;
+            mc.player.inventory.currentItem = this.obiSlot;
             this.placeBlock(new BlockPos(this.placeTarget), EnumFacing.DOWN);
-            Auto32K.mc.player.inventory.currentItem = this.dispenserSlot;
+            mc.player.inventory.currentItem = this.dispenserSlot;
             this.placeBlock(new BlockPos(this.placeTarget.add(0, 1, 0)), EnumFacing.DOWN);
-            Auto32K.mc.player.connection.sendPacket((Packet) new CPacketEntityAction((Entity) Auto32K.mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
+            mc.player.connection.sendPacket(new CPacketEntityAction(Auto32K.mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
             this.isSneaking = false;
-            Auto32K.mc.player.connection.sendPacket((Packet) new CPacketPlayerTryUseItemOnBlock(this.placeTarget.add(0, 1, 0), EnumFacing.DOWN, EnumHand.MAIN_HAND, 0.0f, 0.0f, 0.0f));
+            mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(this.placeTarget.add(0, 1, 0), EnumFacing.DOWN, EnumHand.MAIN_HAND, 0.0f, 0.0f, 0.0f));
             this.stage = 1;
             return;
         }
         if (this.stage == 1) {
-            if (!(Auto32K.mc.currentScreen instanceof GuiContainer)) {
+            if (!(mc.currentScreen instanceof GuiContainer)) {
                 return;
             }
-            Auto32K.mc.playerController.windowClick(Auto32K.mc.player.openContainer.windowId, 1, this.shulkerSlot, ClickType.SWAP, (EntityPlayer) Auto32K.mc.player);
-            Auto32K.mc.player.closeScreen();
-            Auto32K.mc.player.inventory.currentItem = this.redstoneSlot;
+            mc.playerController.windowClick(mc.player.openContainer.windowId, 1, this.shulkerSlot, ClickType.SWAP, mc.player);
+            mc.player.closeScreen();
+            mc.player.inventory.currentItem = this.redstoneSlot;
             this.placeBlock(new BlockPos(this.placeTarget.add(0, 2, 0)), EnumFacing.DOWN);
             this.stage = 2;
             return;
         }
         if (this.stage == 2) {
-            Block block = Auto32K.mc.world.getBlockState(this.placeTarget.offset(Auto32K.mc.player.getHorizontalFacing().getOpposite()).up()).getBlock();
+            Block block = mc.world.getBlockState(this.placeTarget.offset(Auto32K.mc.player.getHorizontalFacing().getOpposite()).up()).getBlock();
             if (block instanceof BlockAir) return;
             if (block instanceof BlockLiquid) {
                 return;
             }
-            Auto32K.mc.player.inventory.currentItem = this.hopperSlot;
-            this.placeBlock(new BlockPos(this.placeTarget.offset(Auto32K.mc.player.getHorizontalFacing().getOpposite())), Auto32K.mc.player.getHorizontalFacing());
-            Auto32K.mc.player.connection.sendPacket(new CPacketEntityAction(Auto32K.mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
+            mc.player.inventory.currentItem = this.hopperSlot;
+            this.placeBlock(new BlockPos(this.placeTarget.offset(mc.player.getHorizontalFacing().getOpposite())), mc.player.getHorizontalFacing());
+            mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
             this.isSneaking = false;
-            Auto32K.mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(this.placeTarget.offset(Auto32K.mc.player.getHorizontalFacing().getOpposite()), EnumFacing.DOWN, EnumHand.MAIN_HAND, 0.0f, 0.0f, 0.0f));
-            Auto32K.mc.player.inventory.currentItem = this.shulkerSlot;
+            mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(this.placeTarget.offset(mc.player.getHorizontalFacing().getOpposite()), EnumFacing.DOWN, EnumHand.MAIN_HAND, 0.0f, 0.0f, 0.0f));
+            mc.player.inventory.currentItem = this.shulkerSlot;
             if (!this.grabItem.getValue()) {
                 this.disable();
                 return;
@@ -150,16 +151,16 @@ public class Auto32K extends Module {
             return;
         }
         if (this.stage != 3) return;
-        if (!(Auto32K.mc.currentScreen instanceof GuiContainer)) {
+        if (!(mc.currentScreen instanceof GuiContainer)) {
             return;
         }
-        if (((GuiContainer) Auto32K.mc.currentScreen).inventorySlots.getSlot(0).getStack().isEmpty) {
-            return;
-        }
-        Auto32K.mc.playerController.windowClick(Auto32K.mc.player.openContainer.windowId, 0, Auto32K.mc.player.inventory.currentItem, ClickType.QUICK_MOVE, Auto32K.mc.player);
+
+        if (((GuiContainer) mc.currentScreen).inventorySlots.getSlot(0).getStack().isEmpty) return;
+
+        mc.playerController.windowClick(mc.player.openContainer.windowId, 0, mc.player.inventory.currentItem, ClickType.QUICK_MOVE, mc.player);
         if (this.autoEnableHitAura.getValue()) {
-            AffinityPlus.getInstance().moduleManager.getModuleByName("BruceAura").enable();
-            AffinityPlus.getInstance().moduleManager.getModuleByName("YakgodAura").enable();
+            ModuleManager.getModuleByName("BruceAura").enable();
+            ModuleManager.getModuleByName("YakgodAura").enable();
         }
         this.disable();
     }

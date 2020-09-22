@@ -5,9 +5,9 @@ import com.gamesense.api.util.BlockInteractionHelper;
 import com.gamesense.client.command.Command;
 import com.gamesense.client.module.Module;
 import com.gamesense.client.module.ModuleManager;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.item.ItemBed;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
 import net.minecraft.util.EnumFacing;
@@ -23,10 +23,12 @@ public class BedAura extends Module {
     private final Setting.Boolean rotate = this.registerBoolean("Rotate", "Rotate", false);
     private final Setting.Boolean debugMessages = this.registerBoolean("Debug Messages", "DebugMessages", false);
     private final Setting.Boolean chainBomb = this.registerBoolean("Chain Bomb", "ChainBomb", true);
-    private int stage;
+    private final Setting.Integer tickDelay = this.registerInteger("Tick Delay", "TickDelay", 5, 0, 40);
     private BlockPos placeTarget;
     private int bedSlot;
     private boolean isSneaking;
+    private int ticksWaited = 0;
+    private boolean firstRun;
 
     public BedAura() {
         super("Bed Aura", Category.Combat);
@@ -39,69 +41,69 @@ public class BedAura extends Module {
             return;
         }
         df.setRoundingMode(RoundingMode.CEILING);
-        this.stage = 0;
+
         this.placeTarget = null;
         this.bedSlot = -1;
-        this.isSneaking = false;
-        for (int i = 0; i < 9 && (this.bedSlot == -1); ++i) {
-            ItemStack stack = mc.player.inventory.getStackInSlot(i);
-            if(stack.getItem() instanceof ItemBed) {
-                this.bedSlot = 1;
-                break;
-            }
+
+        for (int i = 0; i < 9; i++) {
+            if (mc.player.inventory.getStackInSlot(i).getItem() == Items.BED) this.bedSlot = i;
         }
+        this.isSneaking = false;
+
         if (this.bedSlot == -1) {
             if (this.debugMessages.getValue()) {
-                Command.sendClientMessage("[AutoBedBomb] Bed(s) missing, disabling.");
+                Command.sendClientMessage("BedAura: Bed(s) missing, disabling.");
             }
             this.disable();
             return;
         }
+
         if (mc.objectMouseOver == null || mc.objectMouseOver.getBlockPos() == null || mc.objectMouseOver.getBlockPos().up() == null) {
             if (this.debugMessages.getValue()) {
-                Command.sendClientMessage("[AutoBedBomb] Not a valid place target, disabling.");
+                Command.sendClientMessage("BedAura: Not a valid place target, disabling.");
             }
             this.disable();
             return;
         }
+
         this.placeTarget = mc.objectMouseOver.getBlockPos().up();
-
-        if (this.debugMessages.getValue() == false) return;
-
+        firstRun = true;
     }
 
-    @Override
-    public void onUpdate() {
-        if (mc.player == null) return;
-        if (ModuleManager.isModuleEnabled("Freecam")) {
+    @Override public void onUpdate() {
+        if (mc.player == null || mc.world == null) return;
+        if (ModuleManager.isModuleEnabled("Freecam")) return;
+        if (!firstRun && tickDelay.getValue() > ticksWaited) {
+            ticksWaited++;
             return;
         }
-        if (this.stage == 0) {
-            mc.player.inventory.currentItem = this.bedSlot;
-            this.placeBlock(new BlockPos(this.placeTarget), EnumFacing.DOWN);
 
-            mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
-            this.isSneaking = false;
-            mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(this.placeTarget.add(0, 0, 0), EnumFacing.DOWN, EnumHand.MAIN_HAND, 0.0f, 0.0f, 0.0f));
-            this.stage = 1;
-            return;
-        }
+        if (firstRun) firstRun = false;
+
+        ticksWaited = 0;
+
+        mc.player.inventory.currentItem = this.bedSlot;
+
+        this.placeBlock(new BlockPos(this.placeTarget), EnumFacing.DOWN);
+
+        mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
+        this.isSneaking = false;
+        mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(this.placeTarget.add(0, 0, 0), EnumFacing.DOWN, EnumHand.MAIN_HAND, 0.0f, 0.0f, 0.0f));
         if (!chainBomb.getValue()) {
             this.disable();
             return;
         }
+        int nextBed = findBedSlot();
+        if (nextBed == -1) {
+            Command.sendClientMessage("BedAura: Bed(s) missing, disabling.");
+            disable();
+        } else {
+            mc.playerController.windowClick(mc.player.inventoryContainer.windowId, nextBed, 0, ClickType.PICKUP, mc.player);
+            mc.playerController.windowClick(mc.player.inventoryContainer.windowId, bedSlot < 9 ? bedSlot + 36 : bedSlot, 0, ClickType.PICKUP, mc.player);
+            mc.playerController.windowClick(mc.player.inventoryContainer.windowId, nextBed, 0, ClickType.PICKUP, mc.player);
 
-        int newBed = findBedSlot();
-
-        if (newBed == -1) {
-            Command.sendClientMessage("[AutoBedBomb] Bed(s) missing, disabling.");
-            return;
+            mc.playerController.updateController();
         }
-
-        mc.playerController.windowClick(0, findBedSlot(), 0, ClickType.PICKUP, mc.player);
-        mc.playerController.updateController();
-        mc.playerController.windowClick(0, bedSlot, 0, ClickType.PICKUP, mc.player);
-        mc.playerController.updateController();
     }
 
     private void placeBlock(BlockPos pos, EnumFacing side) {

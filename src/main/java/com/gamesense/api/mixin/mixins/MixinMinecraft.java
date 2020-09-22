@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = Minecraft.class, priority = 9999)
 public class MixinMinecraft {
-
     @Shadow
     public EntityPlayerSP player;
 

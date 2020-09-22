@@ -5,10 +5,12 @@ import com.gamesense.api.settings.Setting;
 import com.gamesense.api.util.world.EntityUtil;
 import com.gamesense.client.module.Module;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -22,8 +24,9 @@ public class BruceAura extends Module {
     private Setting.Boolean attackPlayers = registerBoolean("Players", "Players", true);
     private Setting.Boolean attackMobs = registerBoolean("Mobs", "Mobs", false);
     private Setting.Boolean attackAnimals = registerBoolean("Animals", "Animals", false);
-    private Setting.Double hitRange = registerDouble("Hit Range", "HitRange", 5.5d, 0.0d, 25.0d);
     private Setting.Boolean ignoreWalls = registerBoolean("Ignore Walls", "IgnoreWalls", true);
+    private Setting.Boolean autoSwapReverted = registerBoolean("Auto Throw Reverted", "AutoThrowReverted", true);
+    private Setting.Double hitRange = registerDouble("Hit Range", "HitRange", 5.5d, 0.0d, 25.0d);
     private Setting.Double waitTick = registerDouble("Tick Delay", "TickDelay", 2.0d, 0.0d, 20.0d);
     private Setting.Mode switchMode = registerMode("Auto Switch", "Autoswitch", Arrays.asList(
             "NONE",
@@ -36,6 +39,7 @@ public class BruceAura extends Module {
             "Only32k"
     ), "SWORD");
     private int waitCounter;
+    private int cached32kSlot = -1;
 
     public BruceAura() {
         super("Bruce Aura", Category.Combat);
@@ -50,7 +54,6 @@ public class BruceAura extends Module {
 
     @Override
     public void onUpdate() {
-
         if (mc.player.isDead || mc.player == null) {
             return;
         }
@@ -67,6 +70,20 @@ public class BruceAura extends Module {
             } else {
                 waitCounter = 0;
             }
+        }
+
+        if (autoSwapReverted.getValue() && switchMode.getValue().equals("Only32k")) {
+            if (cached32kSlot == -1) return;
+
+            if (!is32kSword(mc.player.inventory.getStackInSlot(cached32kSlot)))
+                mc.playerController.windowClick(0, cached32kSlot, 0, ClickType.THROW, mc.player);
+
+            if (!(mc.currentScreen instanceof GuiContainer)) return;
+            if (((GuiContainer) mc.currentScreen).inventorySlots.getSlot(0).getStack().isEmpty) return;
+            if (!checkSharpness(((GuiContainer) mc.currentScreen).inventorySlots.getSlot(0).getStack())) return;
+            mc.playerController.windowClick(mc.player.openContainer.windowId, 0, mc.player.inventory.currentItem, ClickType.PICKUP, mc.player);
+            mc.playerController.windowClick(0, cached32kSlot, 0, ClickType.PICKUP, mc.player);
+            mc.playerController.updateController();
         }
 
         Iterator<Entity> entityIterator = Minecraft.getMinecraft().world.loadedEntityList.iterator();
@@ -104,7 +121,6 @@ public class BruceAura extends Module {
     }
 
     private boolean checkSharpness(ItemStack stack) {
-
         if (stack.getTagCompound() == null) {
             return false;
         }
@@ -147,15 +163,19 @@ public class BruceAura extends Module {
     }
 
     private void attack(Entity e) {
-
         boolean holding32k = false;
 
         if (checkSharpness(mc.player.getHeldItemMainhand())) {
+            if (cached32kSlot == -1) {
+                for (int i = 0; i < 9; i++) {
+                    if (mc.player.inventory.getStackInSlot(i) == mc.player.getHeldItemMainhand()) cached32kSlot = i + 36;
+                    return;
+                }
+            }
             holding32k = true;
         }
 
         if ((switchMode.getValue().equals("Only32k") || switchMode.getValue().equals("ALL")) && !holding32k) {
-
             int newSlot = -1;
 
             for (int i = 0; i < 9; i++) {
@@ -165,6 +185,7 @@ public class BruceAura extends Module {
                 }
                 if (checkSharpness(stack)) {
                     newSlot = i;
+                    if (cached32kSlot == -1) cached32kSlot = i;
                     break;
                 }
             }
@@ -187,5 +208,30 @@ public class BruceAura extends Module {
 
     private boolean canEntityFeetBeSeen(Entity entityIn) {
         return mc.world.rayTraceBlocks(new Vec3d(mc.player.posX, mc.player.posY + mc.player.getEyeHeight(), mc.player.posZ), new Vec3d(entityIn.posX, entityIn.posY, entityIn.posZ), false, true, false) == null;
+    }
+
+    private boolean is32kSword(ItemStack stack) {
+        if (stack.getTagCompound() == null) {
+            return false;
+        }
+
+        NBTTagList enchants = (NBTTagList) stack.getTagCompound().getTag("ench");
+
+        if (enchants == null) {
+            return false;
+        }
+
+        for (int i = 0; i < enchants.tagCount(); i++) {
+            NBTTagCompound enchant = enchants.getCompoundTagAt(i);
+            if (enchant.getInteger("id") == 16) {
+                int lvl = enchant.getInteger("lvl");
+                if (lvl >= 42) {
+                    return true;
+                }
+                break;
+            }
+        }
+
+        return false;
     }
 }

@@ -23,7 +23,6 @@ public class AutoTotem extends Module {
 
     @Override
     public void onUpdate() {
-        if (mc.currentScreen instanceof GuiContainer) return;
         if (returnI) {
             int t = -1;
             for (int i = 0; i < 45; i++)

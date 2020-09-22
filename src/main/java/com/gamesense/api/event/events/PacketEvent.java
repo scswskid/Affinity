@@ -4,7 +4,6 @@ import com.gamesense.api.event.GameSenseEvent;
 import net.minecraft.network.Packet;
 
 public class PacketEvent extends GameSenseEvent {
-
     private final Packet packet;
 
     public PacketEvent(Packet packet) {

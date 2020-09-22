@@ -10,7 +10,6 @@ import com.gamesense.api.util.config.LoadModules;
 import com.gamesense.api.util.config.SaveConfiguration;
 import com.gamesense.api.util.config.SaveModules;
 import com.gamesense.api.util.font.CFontRenderer;
-import com.gamesense.api.util.render.CapeUtils;
 import com.gamesense.api.util.world.TpsUtils;
 import com.gamesense.client.clickgui.ClickGUI;
 import com.gamesense.client.command.CommandManager;
@@ -49,7 +48,6 @@ public class AffinityPlus {
     public LoadConfiguration loadConfiguration;
     public SaveModules saveModules;
     public LoadModules loadModules;
-    public CapeUtils capeUtils;
     public MacroManager macroManager;
     EventProcessor eventProcessor;
 
@@ -114,7 +112,6 @@ public class AffinityPlus {
     public void postInit(FMLPostInitializationEvent event) {
         Display.setTitle(MODNAME + " " + MODVER);
 
-        capeUtils = new CapeUtils();
         log.info("Capes initialised!");
 
         log.info("PostInitialization complete!\n");
