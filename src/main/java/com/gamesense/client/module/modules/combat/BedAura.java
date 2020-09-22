@@ -23,11 +23,13 @@ public class BedAura extends Module {
     private final Setting.Boolean rotate = this.registerBoolean("Rotate", "Rotate", false);
     private final Setting.Boolean debugMessages = this.registerBoolean("Debug Messages", "DebugMessages", false);
     private final Setting.Boolean chainBomb = this.registerBoolean("Chain Bomb", "ChainBomb", true);
+    private final Setting.Boolean fastMode = this.registerBoolean("Fast Mode", "FastMode", true);
     private final Setting.Integer tickDelay = this.registerInteger("Tick Delay", "TickDelay", 5, 0, 40);
     private BlockPos placeTarget;
     private int bedSlot;
-    private boolean isSneaking;
     private int ticksWaited = 0;
+    private int normalTickDelay;
+    private boolean isSneaking;
     private boolean firstRun;
 
     public BedAura() {
@@ -40,6 +42,9 @@ public class BedAura extends Module {
             this.disable();
             return;
         }
+
+        normalTickDelay = mc.rightClickDelayTimer;
+
         df.setRoundingMode(RoundingMode.CEILING);
 
         this.placeTarget = null;
@@ -83,6 +88,14 @@ public class BedAura extends Module {
         ticksWaited = 0;
 
         mc.player.inventory.currentItem = this.bedSlot;
+
+        if (fastMode.getValue()) {
+            if (mc.player.getHeldItemMainhand().getItem() == Items.BED) {
+                mc.rightClickDelayTimer = 0;
+            }
+        } else {
+            mc.rightClickDelayTimer = normalTickDelay;
+        }
 
         this.placeBlock(new BlockPos(this.placeTarget), EnumFacing.DOWN);
 

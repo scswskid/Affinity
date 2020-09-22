@@ -229,8 +229,7 @@ public class AutoCrystalRewrite extends Module {
         }
 
         List<BlockPos> blocks = findCrystalBlocks();
-        List<Entity> entities = new ArrayList<>();
-        entities.addAll(mc.world.playerEntities.stream().filter(entityPlayer -> !Friends.isFriend(entityPlayer.getName())).sorted(Comparator.comparing(e -> mc.player.getDistance(e))).collect(Collectors.toList()));
+        List<Entity> entities = new ArrayList<>(mc.world.playerEntities.stream().filter(entityPlayer -> !Friends.isFriend(entityPlayer.getName())).sorted(Comparator.comparing(e -> mc.player.getDistance(e))).collect(Collectors.toList()));
 
         double damage = 0.5D;
         Iterator var9 = entities.iterator();
@@ -250,6 +249,7 @@ public class AutoCrystalRewrite extends Module {
 
                         render = queuedBlock;
                         calcAndPlaceCrystal();
+                        return;
                     }
 
                     entity = (EntityPlayer) var9.next();
@@ -496,7 +496,7 @@ public class AutoCrystalRewrite extends Module {
                        .filter(myCrystal -> myCrystal instanceof EntityEnderCrystal)
                        .filter(e -> mc.player.getDistance(e) <= range.getValue())
                        .filter(AutoCrystalRewrite::crystalCheck)
-                       .filter(placedCrystals::contains)
+                       .filter(entity -> placedCrystals.contains(new BlockPos(entity.posX, entity.posY, entity.posZ)))
                        .map(myCrystal -> (EntityEnderCrystal) myCrystal)
                        .min(Comparator.comparing(c -> mc.player.getDistance(c)))
                        .orElse(null); //IF breakMode != "All"
@@ -542,7 +542,6 @@ public class AutoCrystalRewrite extends Module {
         }
     }
     private static void explodeCrystal(EntityEnderCrystal crystal) {
-
         if (antiSuicide.getValue()) {
             if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < antiSuicideValue.getValue()) {
                 return;
@@ -584,7 +583,6 @@ public class AutoCrystalRewrite extends Module {
         }
 
         if (System.nanoTime() / 1000000L - breakSystemTime >= 420 - attackSpeed.getValue() * 20) {
-
             isActive = true;
             isBreaking = true;
 
@@ -592,26 +590,18 @@ public class AutoCrystalRewrite extends Module {
                 lookAtPacket(crystal.posX, crystal.posY, crystal.posZ, mc.player);
             }
 
-            /**
-             * @Author Hoosiers
-             * Pretty WIP, but it seems to make the CA much faster
-             */
             mc.playerController.attackEntity(mc.player, crystal);
             if (crystal == null) {
                 return;
             }
+
             if (handBreak.getValue().equalsIgnoreCase("Offhand") && !mc.player.getHeldItemOffhand().isEmpty) {
                 mc.player.swingArm(EnumHand.OFF_HAND);
-                if (cancelCrystal.getValue()) {
-                    doCancelCrystal(crystal);
-                }
-
             } else {
                 mc.player.swingArm(EnumHand.MAIN_HAND);
-                if (cancelCrystal.getValue()) {
-                    doCancelCrystal(crystal);
-                }
-
+            }
+            if (cancelCrystal.getValue()) {
+                doCancelCrystal(crystal);
             }
             if (handBreak.getValue().equalsIgnoreCase("Both")) {
                 mc.player.swingArm(EnumHand.MAIN_HAND);
@@ -653,8 +643,19 @@ public class AutoCrystalRewrite extends Module {
             if (rotate.getValue())
                 lookAtPacket((double) queuedBlock.getX() + 0.5D, (double) queuedBlock.getY() - 0.5D, (double) queuedBlock.getZ() + 0.5D, mc.player);
 
-            RayTraceResult result = mc.world.rayTraceBlocks(new Vec3d(mc.player.posX, mc.player.posY + (double) mc.player.getEyeHeight(), mc.player.posZ), new Vec3d((double) queuedBlock.getX() + 0.5D, (double) queuedBlock.getY() - 0.5D, (double) queuedBlock.getZ() + 0.5D));
+            RayTraceResult result;
             if (raytrace.getValue()) {
+                result = mc.world.rayTraceBlocks(
+                        new Vec3d(
+                                mc.player.posX,
+                                mc.player.posY + (double) mc.player.getEyeHeight(),
+                                mc.player.posZ
+                        ),
+                        new Vec3d(
+                                (double) queuedBlock.getX() + 0.5D,
+                                (double) queuedBlock.getY() - 0.5D,
+                                (double) queuedBlock.getZ() + 0.5D)
+                );
                 if (result == null || result.sideHit == null) {
                     queuedBlock = null;
                     facing = null;
@@ -697,6 +698,7 @@ public class AutoCrystalRewrite extends Module {
     private static void doCancelCrystal(EntityEnderCrystal crystal) {
         crystal.setDead();
         mc.world.removeEntity(crystal);
+        mc.world.removeAllEntities();
         mc.world.getLoadedEntityList();
     }
     private static void addToAutoGG(String name) {

@@ -30,7 +30,7 @@ public class AutoTotem extends Module {
                     t = i;
                     break;
                 }
-            if (t == -1) return;
+            if (t <= -1 || t >= 45) return;
             mc.playerController.windowClick(0, t < 9 ? t + 36 : t, 0, ClickType.PICKUP, mc.player);
             returnI = false;
         }
@@ -39,7 +39,9 @@ public class AutoTotem extends Module {
         else {
             if (soft.getValue() && !AutoTotem.mc.player.getHeldItemOffhand().isEmpty()) return;
             if (moving) {
-                mc.playerController.windowClick(0, 45, 0, ClickType.PICKUP, mc.player);
+                try {
+                    mc.playerController.windowClick(0, 45, 0, ClickType.PICKUP, mc.player);
+                } catch (Exception ignored) {}
                 moving = false;
                 if (!mc.player.inventory.getItemStack().isEmpty()) returnI = true;
                 return;
