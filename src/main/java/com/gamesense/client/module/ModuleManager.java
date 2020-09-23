@@ -29,6 +29,7 @@ public class ModuleManager {
         addMod(new AutoCrystal());
         addMod(new AutoCrystalRewrite());
         addMod(new Surround());
+        addMod(new BetterSurround());
         addMod(new AutoTotem());
         addMod(new AutoTrap());
         addMod(new AutoWeb());

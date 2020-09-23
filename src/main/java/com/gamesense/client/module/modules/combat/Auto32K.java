@@ -157,7 +157,10 @@ public class Auto32K extends Module {
 
         if (((GuiContainer) mc.currentScreen).inventorySlots.getSlot(0).getStack().isEmpty) return;
 
-        mc.playerController.windowClick(mc.player.openContainer.windowId, 0, mc.player.inventory.currentItem, ClickType.QUICK_MOVE, mc.player);
+//        mc.playerController.windowClick(mc.player.openContainer.windowId, 0, 0, ClickType.PICKUP, mc.player);
+//        mc.playerController.windowClick(mc.player.openContainer.windowId, shulkerSlot, 0, ClickType.PICKUP, mc.player);
+//        hello
+        mc.playerController.windowClick(mc.player.openContainer.windowId, 0, 0, ClickType.QUICK_MOVE, mc.player);
         if (this.autoEnableHitAura.getValue()) {
             ModuleManager.getModuleByName("Bruce Aura").enable();
             ModuleManager.getModuleByName("YakgodAura").enable();

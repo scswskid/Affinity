@@ -1,297 +1,321 @@
 package com.gamesense.client.module.modules.combat;
 
-import com.gamesense.api.event.events.PlayerMoveEvent;
 import com.gamesense.api.settings.Setting;
-import com.gamesense.api.util.BlockInteractionHelper;
 import com.gamesense.client.module.Module;
-import me.zero.alpine.listener.EventHandler;
-import me.zero.alpine.listener.Listener;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.BlockEnderChest;
+import net.minecraft.block.BlockObsidian;
+import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.network.play.client.CPacketPlayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.Arrays;
-
 public class BetterSurround extends Module {
-    public final Setting.Boolean disable = registerBoolean("Toggles", "Toggles", false);
-    public final Setting.Boolean ToggleOffGround = registerBoolean("ToggleOffGround", "TogglesOffGround", true);
-    public final Setting.Mode CenterMode = registerMode("Center", "Center", Arrays.asList(
-            "Teleport",
-            "NCP",
-            "None"
-    ), "NCP");
+    private Setting.Boolean sneak = registerBoolean("Only When Sneaking", "Sneak", false);
+    private Setting.Boolean teleport = registerBoolean("Auto Center", "Teleport", true);
+    private Setting.Boolean endChest = registerBoolean("Use EChests", "EndChest", false);
+    private Setting.Boolean jumpDisable = registerBoolean("Disable On Jump", "JumpDisable", true);
+    private Setting.Boolean autoToggle = registerBoolean("Auto Toggle", "AutoToggle", false);
+    private Setting.Boolean chainPopToggle = registerBoolean("Anti Chain Pop", "ChainPopToggle", false);
 
-    public final Setting.Boolean rotate = registerBoolean("Rotate", "Rotate", true);
-    public final Setting.Integer BlocksPerTick = registerInteger("BlocksPerTick", "BlocksPerTick", 1, 1, 10);
-    public final Setting.Boolean ActivateOnlyOnShift = registerBoolean("ActivateOnlyOnShift", "ActivateOnlyOnShift", false);
-
-    public enum CenterModes
-    {
-        Teleport,
-        NCP,
-        None,
+    public BetterSurround() {
+        super("BetterSurround", Category.Combat);
     }
 
-    public BetterSurround()
-    {
-        super("Surround", Category.Combat);
+    public static boolean hasNeighbour(BlockPos blockPos) {
+        for (EnumFacing side : EnumFacing.values()) {
+            BlockPos neighbour = blockPos.offset(side);
+            if (!mc.world.getBlockState(neighbour).getMaterial().isReplaceable())
+                return true;
+        }
+        return false;
     }
-
-    private Vec3d Center = Vec3d.ZERO;
 
     @Override
-    public void onEnable()
-    {
-        super.onEnable();
+    public void onUpdate() {
+        if (mc.player == null) return;
+        if (sneak.getValue() && !mc.gameSettings.keyBindSneak.isKeyDown()) return;
+        if (!mc.player.onGround) {
+            if (mc.gameSettings.keyBindJump.isKeyDown() && jumpDisable.getValue()) toggle();
+            return;
+        }
+        final Vec3d vec3d = getInterpolatedPos(mc.player, 0);
+        BlockPos northBlockPos = new BlockPos(vec3d).north();
+        BlockPos southBlockPos = new BlockPos(vec3d).south();
+        BlockPos eastBlockPos = new BlockPos(vec3d).east();
+        BlockPos westBlockPos = new BlockPos(vec3d).west();
+        final int newSlot = findBlockInHotbar();
+        if (newSlot == -1)
+            return;
+        final BlockPos centerPos = mc.player.getPosition();
+        double y = centerPos.getY();
+        double x = centerPos.getX();
+        double z = centerPos.getZ();
+        final Vec3d plusPlus = new Vec3d(x + 0.5, y, z + 0.5);
+        final Vec3d plusMinus = new Vec3d(x + 0.5, y, z - 0.5);
+        final Vec3d minusMinus = new Vec3d(x - 0.5, y, z - 0.5);
+        final Vec3d minusPlus = new Vec3d(x - 0.5, y, z + 0.5);
+        final int oldSlot = mc.player.inventory.currentItem;
+        mc.player.inventory.currentItem = newSlot;
+        if (!hasNeighbour(northBlockPos)) {
+            for (EnumFacing side : EnumFacing.values()) {
+                BlockPos neighbour = northBlockPos.offset(side);
+                if (hasNeighbour(neighbour)) {
+                    northBlockPos = neighbour;
+                    break;
+                }
+            }
+        }
 
-        if (mc.player == null)
-        {
+        if (!hasNeighbour(southBlockPos)) {
+            for (EnumFacing side : EnumFacing.values()) {
+                BlockPos neighbour = southBlockPos.offset(side);
+                if (hasNeighbour(neighbour)) {
+                    southBlockPos = neighbour;
+                    break;
+                }
+            }
+        }
+
+        if (!hasNeighbour(eastBlockPos)) {
+            for (EnumFacing side : EnumFacing.values()) {
+                BlockPos neighbour = eastBlockPos.offset(side);
+                if (hasNeighbour(neighbour)) {
+                    eastBlockPos = neighbour;
+                    break;
+                }
+            }
+        }
+
+        if (!hasNeighbour(westBlockPos)) {
+            for (EnumFacing side : EnumFacing.values()) {
+                BlockPos neighbour = westBlockPos.offset(side);
+                if (hasNeighbour(neighbour)) {
+                    westBlockPos = neighbour;
+                    break;
+                }
+            }
+        }
+
+        if (mc.world.getBlockState(northBlockPos).getMaterial().isReplaceable() && isEntitiesEmpty(northBlockPos)) {
+            if (mc.player.onGround && teleport.getValue()) {
+                if (getDst(plusPlus) < getDst(plusMinus) && getDst(plusPlus) < getDst(minusMinus) && getDst(plusPlus) < getDst(minusPlus)) {
+                    x = centerPos.getX() + 0.5;
+                    z = centerPos.getZ() + 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(plusMinus) < getDst(plusPlus) && getDst(plusMinus) < getDst(minusMinus) && getDst(plusMinus) < getDst(minusPlus)) {
+                    x = centerPos.getX() + 0.5;
+                    z = centerPos.getZ() - 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(minusMinus) < getDst(plusPlus) && getDst(minusMinus) < getDst(plusMinus) && getDst(minusMinus) < getDst(minusPlus)) {
+                    x = centerPos.getX() - 0.5;
+                    z = centerPos.getZ() - 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(minusPlus) < getDst(plusPlus) && getDst(minusPlus) < getDst(plusMinus) && getDst(minusPlus) < getDst(minusMinus)) {
+                    x = centerPos.getX() - 0.5;
+                    z = centerPos.getZ() + 0.5;
+                    centerPlayer(x, y, z);
+                }
+            }
+            placeBlockScaffold(northBlockPos, true);
+        }
+
+        if (mc.world.getBlockState(southBlockPos).getMaterial().isReplaceable() && isEntitiesEmpty(southBlockPos)) {
+            if (mc.player.onGround && teleport.getValue()) {
+                if (getDst(plusPlus) < getDst(plusMinus) && getDst(plusPlus) < getDst(minusMinus) && getDst(plusPlus) < getDst(minusPlus)) {
+                    x = centerPos.getX() + 0.5;
+                    z = centerPos.getZ() + 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(plusMinus) < getDst(plusPlus) && getDst(plusMinus) < getDst(minusMinus) && getDst(plusMinus) < getDst(minusPlus)) {
+                    x = centerPos.getX() + 0.5;
+                    z = centerPos.getZ() - 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(minusMinus) < getDst(plusPlus) && getDst(minusMinus) < getDst(plusMinus) && getDst(minusMinus) < getDst(minusPlus)) {
+                    x = centerPos.getX() - 0.5;
+                    z = centerPos.getZ() - 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(minusPlus) < getDst(plusPlus) && getDst(minusPlus) < getDst(plusMinus) && getDst(minusPlus) < getDst(minusMinus)) {
+                    x = centerPos.getX() - 0.5;
+                    z = centerPos.getZ() + 0.5;
+                    centerPlayer(x, y, z);
+                }
+            }
+            placeBlockScaffold(southBlockPos, true);
+        }
+
+        if (mc.world.getBlockState(eastBlockPos).getMaterial().isReplaceable() && isEntitiesEmpty(eastBlockPos)) {
+            if (mc.player.onGround && teleport.getValue()) {
+                if (getDst(plusPlus) < getDst(plusMinus) && getDst(plusPlus) < getDst(minusMinus) && getDst(plusPlus) < getDst(minusPlus)) {
+                    x = centerPos.getX() + 0.5;
+                    z = centerPos.getZ() + 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(plusMinus) < getDst(plusPlus) && getDst(plusMinus) < getDst(minusMinus) && getDst(plusMinus) < getDst(minusPlus)) {
+                    x = centerPos.getX() + 0.5;
+                    z = centerPos.getZ() - 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(minusMinus) < getDst(plusPlus) && getDst(minusMinus) < getDst(plusMinus) && getDst(minusMinus) < getDst(minusPlus)) {
+                    x = centerPos.getX() - 0.5;
+                    z = centerPos.getZ() - 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(minusPlus) < getDst(plusPlus) && getDst(minusPlus) < getDst(plusMinus) && getDst(minusPlus) < getDst(minusMinus)) {
+                    x = centerPos.getX() - 0.5;
+                    z = centerPos.getZ() + 0.5;
+                    centerPlayer(x, y, z);
+                }
+            }
+            placeBlockScaffold(eastBlockPos, true);
+        }
+
+        if (mc.world.getBlockState(westBlockPos).getMaterial().isReplaceable() && isEntitiesEmpty(westBlockPos)) {
+            if (mc.player.onGround && teleport.getValue()) {
+                if (getDst(plusPlus) < getDst(plusMinus) && getDst(plusPlus) < getDst(minusMinus) && getDst(plusPlus) < getDst(minusPlus)) {
+                    x = centerPos.getX() + 0.5;
+                    z = centerPos.getZ() + 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(plusMinus) < getDst(plusPlus) && getDst(plusMinus) < getDst(minusMinus) && getDst(plusMinus) < getDst(minusPlus)) {
+                    x = centerPos.getX() + 0.5;
+                    z = centerPos.getZ() - 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(minusMinus) < getDst(plusPlus) && getDst(minusMinus) < getDst(plusMinus) && getDst(minusMinus) < getDst(minusPlus)) {
+                    x = centerPos.getX() - 0.5;
+                    z = centerPos.getZ() - 0.5;
+                    centerPlayer(x, y, z);
+                }
+                if (getDst(minusPlus) < getDst(plusPlus) && getDst(minusPlus) < getDst(plusMinus) && getDst(minusPlus) < getDst(minusMinus)) {
+                    x = centerPos.getX() - 0.5;
+                    z = centerPos.getZ() + 0.5;
+                    centerPlayer(x, y, z);
+                }
+            }
+            placeBlockScaffold(westBlockPos, true);
+        }
+        mc.player.inventory.currentItem = oldSlot;
+        if ((autoToggle.getValue() || chainPopToggle.getValue()) && (mc.world.getBlockState(new BlockPos(vec3d).north()).getBlock() == Blocks.OBSIDIAN || mc.world.getBlockState(new BlockPos(vec3d).north()).getBlock() == Blocks.BEDROCK) && (mc.world.getBlockState(new BlockPos(vec3d).south()).getBlock() == Blocks.OBSIDIAN || mc.world.getBlockState(new BlockPos(vec3d).south()).getBlock() == Blocks.BEDROCK) && (mc.world.getBlockState(new BlockPos(vec3d).west()).getBlock() == Blocks.OBSIDIAN || mc.world.getBlockState(new BlockPos(vec3d).west()).getBlock() == Blocks.BEDROCK) && (mc.world.getBlockState(new BlockPos(vec3d).east()).getBlock() == Blocks.OBSIDIAN || mc.world.getBlockState(new BlockPos(vec3d).east()).getBlock() == Blocks.BEDROCK)) {
+            chainPopToggle.setValue(false);
             toggle();
-            return;
-        }
-
-        if (ActivateOnlyOnShift.getValue())
-            return;
-
-        Center = GetCenter(mc.player.posX, mc.player.posY, mc.player.posZ);
-
-        if (!CenterMode.getValue().equals("None"))
-        {
-            mc.player.motionX = 0;
-            mc.player.motionZ = 0;
-        }
-
-        if (CenterMode.getValue().equals("Teleport"))
-        {
-            mc.player.connection.sendPacket(new CPacketPlayer.Position(Center.x, Center.y, Center.z, true));
-            mc.player.setPosition(Center.x, Center.y, Center.z);
         }
     }
 
-    @EventHandler
-    private Listener<PlayerMoveEvent> OnPlayerUpdate = new Listener<>(p_Event ->
-    {
-        if (ActivateOnlyOnShift.getValue())
-        {
-            if (!mc.gameSettings.keyBindSneak.isKeyDown())
-            {
-                Center = Vec3d.ZERO;
-                return;
-            }
-
-            if (Center == Vec3d.ZERO)
-            {
-                Center = GetCenter(mc.player.posX, mc.player.posY, mc.player.posZ);
-
-                if (!CenterMode.getValue().equals("None"))
-                {
-                    mc.player.motionX = 0;
-                    mc.player.motionZ = 0;
-                }
-
-                if (CenterMode.getValue().equals("Teleport"))
-                {
-                    mc.player.connection.sendPacket(new CPacketPlayer.Position(Center.x, Center.y, Center.z, true));
-                    mc.player.setPosition(Center.x, Center.y, Center.z);
-                }
-            }
-        }
-
-        /// NCP Centering
-        if (Center != Vec3d.ZERO && CenterMode.getValue().equals("NCP"))
-        {
-            double l_XDiff = Math.abs(Center.x - mc.player.posX);
-            double l_ZDiff = Math.abs(Center.z - mc.player.posZ);
-
-            if (l_XDiff <= 0.1 && l_ZDiff <= 0.1)
-            {
-                Center = Vec3d.ZERO;
-            }
-            else
-            {
-                double l_MotionX = Center.x-mc.player.posX;
-                double l_MotionZ = Center.z-mc.player.posZ;
-
-                mc.player.motionX = l_MotionX/2;
-                mc.player.motionZ = l_MotionZ/2;
-            }
-        }
-
-        if (!mc.player.onGround && !ActivateOnlyOnShift.getValue())
-        {
-            if (ToggleOffGround.getValue())
-            {
-                toggle();
-                return;
-            }
-        }
-
-        final Vec3d pos = interpolateEntity(mc.player, mc.getRenderPartialTicks());
-
-        final BlockPos interpPos = new BlockPos(pos.x, pos.y, pos.z);
-
-        final BlockPos north = interpPos.north();
-        final BlockPos south = interpPos.south();
-        final BlockPos east = interpPos.east();
-        final BlockPos west = interpPos.west();
-
-        BlockPos[] l_Array = {north, south, east, west};
-
-        /// We don't need to do anything if we are not surrounded
-        if (IsSurrounded(mc.player))
-            return;
-
-        int lastSlot;
-        final int slot = findStackHotbar(Blocks.OBSIDIAN);
-        if (hasStack(Blocks.OBSIDIAN) || slot != -1)
-        {
-            if ((mc.player.onGround))
-            {
-                lastSlot = mc.player.inventory.currentItem;
-                mc.player.inventory.currentItem = slot;
-                mc.playerController.updateController();
-
-                int l_BlocksPerTick = BlocksPerTick.getValue();
-
-                for (BlockPos l_Pos : l_Array)
-                {
-                    BlockInteractionHelper.ValidResult l_Result = BlockInteractionHelper.valid(l_Pos);
-
-                    if (l_Result == BlockInteractionHelper.ValidResult.AlreadyBlockThere && !mc.world.getBlockState(l_Pos).getMaterial().isReplaceable())
-                        continue;
-
-                    if (l_Result == BlockInteractionHelper.ValidResult.NoNeighbors)
-                    {
-                        final BlockPos[] l_Test = {  l_Pos.down(), l_Pos.north(), l_Pos.south(), l_Pos.east(), l_Pos.west(), l_Pos.up(), };
-
-                        for (BlockPos l_Pos2 : l_Test)
-                        {
-                            BlockInteractionHelper.ValidResult l_Result2 = BlockInteractionHelper.valid(l_Pos2);
-
-                            if (l_Result2 == BlockInteractionHelper.ValidResult.NoNeighbors || l_Result2 == BlockInteractionHelper.ValidResult.NoEntityCollision)
-                                continue;
-
-                            BlockInteractionHelper.place (l_Pos2, 5.0f, false, false);
-                            p_Event.cancel();
-                            float[] rotations = BlockInteractionHelper.getLegitRotations(new Vec3d(l_Pos2.getX(), l_Pos2.getY(), l_Pos2.getZ()));
-                            break;
-                        }
-
-                        continue;
-                    }
-
-                    BlockInteractionHelper.place (l_Pos, 5.0f, false, false);
-
-                    p_Event.cancel();
-
-                    float[] rotations = BlockInteractionHelper.getLegitRotations(new Vec3d(l_Pos.getX(), l_Pos.getY(), l_Pos.getZ()));
-                    if (--l_BlocksPerTick <= 0)
-                        break;
-                }
-
-                if (!slotEqualsBlock(lastSlot, Blocks.OBSIDIAN))
-                {
-                    mc.player.inventory.currentItem = lastSlot;
-                }
-                mc.playerController.updateController();
-
-                if (this.disable.getValue())
-                {
-                    this.toggle();
-                }
-            }
-        }
-    });
-
-    public boolean IsSurrounded(EntityPlayer p_Who)
-    {
-        final Vec3d l_PlayerPos = interpolateEntity(mc.player, mc.getRenderPartialTicks());
-
-        final BlockPos l_InterpPos = new BlockPos(l_PlayerPos.x, l_PlayerPos.y, l_PlayerPos.z);
-
-        final BlockPos l_North = l_InterpPos.north();
-        final BlockPos l_South = l_InterpPos.south();
-        final BlockPos l_East = l_InterpPos.east();
-        final BlockPos l_West = l_InterpPos.west();
-
-        BlockPos[] l_Array = {l_North, l_South, l_East, l_West};
-
-        for (BlockPos l_Pos : l_Array)
-        {
-            if (BlockInteractionHelper.valid(l_Pos) != BlockInteractionHelper.ValidResult.AlreadyBlockThere)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public boolean hasStack(Block type)
-    {
-        if (mc.player.inventory.getCurrentItem().getItem() instanceof ItemBlock)
-        {
-            final ItemBlock block = (ItemBlock) mc.player.inventory.getCurrentItem().getItem();
-            return block.getBlock() == type;
-        }
-        return false;
-    }
-
-    private boolean slotEqualsBlock(int slot, Block type)
-    {
-        if (mc.player.inventory.getStackInSlot(slot).getItem() instanceof ItemBlock)
-        {
-            final ItemBlock block = (ItemBlock) mc.player.inventory.getStackInSlot(slot).getItem();
-            return block.getBlock() == type;
-        }
-
-        return false;
-    }
-
-    private int findStackHotbar(Block type)
-    {
-        for (int i = 0; i < 9; i++)
-        {
-            final ItemStack stack = Minecraft.getMinecraft().player.inventory.getStackInSlot(i);
-            if (stack.getItem() instanceof ItemBlock)
-            {
-                final ItemBlock block = (ItemBlock) stack.getItem();
-
-                if (block.getBlock() == type)
-                {
+    private int findBlockInHotbar() {
+        for (int i = 0; i < 9; ++i) {
+            final ItemStack stack = mc.player.inventory.getStackInSlot(i);
+            if (stack != ItemStack.EMPTY && stack.getItem() instanceof ItemBlock) {
+                final Block block = ((ItemBlock) stack.getItem()).getBlock();
+                if (block instanceof BlockObsidian) {
                     return i;
+                }
+            }
+        }
+        if (endChest.getValue()) {
+            for (int i = 0; i < 9; ++i) {
+                final ItemStack stack = mc.player.inventory.getStackInSlot(i);
+                if (stack != ItemStack.EMPTY && stack.getItem() instanceof ItemBlock) {
+                    final Block block = ((ItemBlock) stack.getItem()).getBlock();
+                    if (block instanceof BlockEnderChest) {
+                        return i;
+                    }
                 }
             }
         }
         return -1;
     }
 
-    public Vec3d GetCenter(double posX, double posY, double posZ)
-    {
-        double x = Math.floor(posX) + 0.5D;
-        double y = Math.floor(posY);
-        double z = Math.floor(posZ) + 0.5D ;
-
-        return new Vec3d(x, y, z);
+    private void centerPlayer(double x, double y, double z) {
+        mc.player.connection.sendPacket(new CPacketPlayer.Position(x, y, z, true));
+        mc.player.setPosition(x, y, z);
     }
 
-    public boolean HasObsidian()
-    {
-        return findStackHotbar(Blocks.OBSIDIAN) != -1;
+    private double getDst(Vec3d vec) {
+        return mc.player.getDistance(vec.x, vec.y, vec.z);
     }
 
-    public static Vec3d interpolateEntity(Entity entity, float time)
-    {
-        return new Vec3d(entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * time,
-                entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * time,
-                entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * time);
+    private boolean isEntitiesEmpty(BlockPos pos) {
+        return mc.world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(pos)).stream().filter(e -> !(e instanceof EntityItem) && !(e instanceof EntityXPOrb)).count() == 0;
     }
 
+    public static void placeBlockScaffold(BlockPos pos, boolean rotate) {
+        for (EnumFacing side : EnumFacing.values()) {
+            final BlockPos neighbor = pos.offset(side);
+            final EnumFacing side2 = side.getOpposite();
+            if (!canBeClicked(neighbor))
+                continue;
+            final Vec3d hitVec = new Vec3d(neighbor).add(new Vec3d(0.5, 0.5, 0.5)).add(new Vec3d(side2.getDirectionVec()).scale(0.5));
+            if (rotate) faceVectorPacketInstant(hitVec);
+            mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.START_SNEAKING));
+            processRightClickBlock(neighbor, side2, hitVec);
+            mc.player.swingArm(EnumHand.MAIN_HAND);
+            mc.rightClickDelayTimer = 0;
+            mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
+            return;
+        }
+    }
+
+    private static PlayerControllerMP getPlayerController() {
+        return mc.playerController;
+    }
+
+    public static void processRightClickBlock(BlockPos pos, EnumFacing side,
+                                              Vec3d hitVec) {
+        getPlayerController().processRightClickBlock(mc.player, mc.world, pos, side, hitVec, EnumHand.MAIN_HAND);
+    }
+
+
+    public static boolean canBeClicked(BlockPos pos) {
+        return mc.world.getBlockState(pos).getBlock().canCollideCheck(mc.world.getBlockState(pos), false);
+    }
+
+    public static void faceVectorPacketInstant(Vec3d vec) {
+        final float[] rotations = getNeededRotations2(vec);
+        mc.player.connection.sendPacket(new CPacketPlayer.Rotation(rotations[0], rotations[1], mc.player.onGround));
+    }
+
+    private static float[] getNeededRotations2(Vec3d vec) {
+        final Vec3d eyesPos = getEyesPos();
+        final double diffX = vec.x - eyesPos.x;
+        final double diffY = vec.y - eyesPos.y;
+        final double diffZ = vec.z - eyesPos.z;
+        final double diffXZ = Math.sqrt(diffX * diffX + diffZ * diffZ);
+        final float yaw = (float) Math.toDegrees(Math.atan2(diffZ, diffX)) - 90F;
+        final float pitch = (float) -Math.toDegrees(Math.atan2(diffY, diffXZ));
+        return new float[]{ mc.player.rotationYaw + MathHelper.wrapDegrees(yaw - mc.player.rotationYaw), mc.player.rotationPitch + MathHelper.wrapDegrees(pitch - mc.player.rotationPitch)};
+    }
+
+    public static Vec3d getEyesPos() {
+        return new Vec3d(mc.player.posX, mc.player.posY + mc.player.getEyeHeight(), mc.player.posZ);
+    }
+
+    public static Vec3d getInterpolatedPos(Entity entity, float ticks) {
+        return new Vec3d(entity.lastTickPosX, entity.lastTickPosY, entity.lastTickPosZ).add(getInterpolatedAmount(entity, ticks));
+    }
+
+    public static Vec3d getInterpolatedAmount(Entity entity, double ticks) {
+        return getInterpolatedAmount(entity, ticks, ticks, ticks);
+    }
+
+    public static Vec3d getInterpolatedAmount(Entity entity, double x, double y, double z) {
+        return new Vec3d((entity.posX - entity.lastTickPosX) * x, (entity.posY - entity.lastTickPosY) * y, (entity.posZ - entity.lastTickPosZ) * z
+        );
+    }
 }
