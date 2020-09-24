@@ -80,7 +80,7 @@ public class BruceAura extends Module {
 
             if (!(mc.currentScreen instanceof GuiContainer)) return;
             if (((GuiContainer) mc.currentScreen).inventorySlots.getSlot(0).getStack().isEmpty) return;
-            if (!checkSharpness(((GuiContainer) mc.currentScreen).inventorySlots.getSlot(0).getStack())) return;
+            if (!is32kSword(((GuiContainer) mc.currentScreen).inventorySlots.getSlot(0).getStack())) return;
             mc.playerController.windowClick(mc.player.openContainer.windowId, 0, mc.player.inventory.currentItem, ClickType.PICKUP, mc.player);
             mc.playerController.windowClick(0, cached32kSlot, 0, ClickType.PICKUP, mc.player);
             mc.playerController.updateController();
@@ -120,60 +120,8 @@ public class BruceAura extends Module {
 
     }
 
-    private boolean checkSharpness(ItemStack stack) {
-        if (stack.getTagCompound() == null) {
-            return false;
-        }
-
-        if (!stack.getItem().equals(Items.DIAMOND_SWORD) && hitMode.getValue().equals("SWORD")) {
-            return false;
-        }
-
-        if (!stack.getItem().equals(Items.DIAMOND_AXE) && hitMode.getValue().equals("AXE")) {
-            return false;
-        }
-
-        NBTTagList enchants = (NBTTagList) stack.getTagCompound().getTag("ench");
-
-        if (enchants == null) {
-            return false;
-        }
-
-        for (int i = 0; i < enchants.tagCount(); i++) {
-            NBTTagCompound enchant = enchants.getCompoundTagAt(i);
-            if (enchant.getInteger("id") == 16) {
-                int lvl = enchant.getInteger("lvl");
-                if (switchMode.getValue().equals("Only32k")) {
-                    if (lvl >= 42) {
-                        return true;
-                    }
-                } else if (switchMode.getValue().equals("ALL")) {
-                    if (lvl >= 4) {
-                        return true;
-                    }
-                } else if (switchMode.getValue().equals("NONE")) {
-                    return true;
-                }
-                break;
-            }
-        }
-
-        return false;
-
-    }
-
     private void attack(Entity e) {
         boolean holding32k = false;
-
-        if (checkSharpness(mc.player.getHeldItemMainhand())) {
-            if (cached32kSlot == -1) {
-                for (int i = 0; i < 9; i++) {
-                    if (mc.player.inventory.getStackInSlot(i) == mc.player.getHeldItemMainhand()) cached32kSlot = i + 36;
-                    return;
-                }
-            }
-            holding32k = true;
-        }
 
         if ((switchMode.getValue().equals("Only32k") || switchMode.getValue().equals("ALL")) && !holding32k) {
             int newSlot = -1;
@@ -183,7 +131,7 @@ public class BruceAura extends Module {
                 if (stack == ItemStack.EMPTY) {
                     continue;
                 }
-                if (checkSharpness(stack)) {
+                if (is32kSword(stack)) {
                     newSlot = i;
                     if (cached32kSlot == -1) cached32kSlot = i;
                     break;

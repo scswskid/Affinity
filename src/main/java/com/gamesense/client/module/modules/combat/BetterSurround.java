@@ -46,8 +46,8 @@ public class BetterSurround extends Module {
     public void onUpdate() {
         if (mc.player == null) return;
         if (sneak.getValue() && !mc.gameSettings.keyBindSneak.isKeyDown()) return;
-        if (!mc.player.onGround) {
-            if (mc.gameSettings.keyBindJump.isKeyDown() && jumpDisable.getValue()) toggle();
+        if (!mc.player.onGround && jumpDisable.getValue()) {
+            toggle();
             return;
         }
         final Vec3d vec3d = getInterpolatedPos(mc.player, 0);
